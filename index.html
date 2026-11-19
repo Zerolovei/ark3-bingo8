@@ -1,0 +1,111 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>第8回 ARK3ビンゴ</title><style>
+*{box-sizing:border-box}body{margin:0;background:#d9eaff url('bac.png') center top/cover fixed;font-family:system-ui,'Yu Gothic',sans-serif;text-align:center;color:#1d2340}main{max-width:850px;margin:auto;padding:12px 5px 45px}h1{color:white;text-shadow:0 3px 8px #182048;margin:8px 0}.toolbar{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:8px 0}button,select{border:0;border-radius:12px;padding:9px 11px;font-weight:bold;cursor:pointer;background:#fff;color:#253354;box-shadow:0 2px 5px #0002}button:disabled{opacity:.5;cursor:default}.primary{background:#8254d6;color:white}.negi{background:#ef9d38;color:#251300}.danger{background:#a33358;color:white}.stats{background:#ffffffd9;border-radius:12px;padding:8px;font-weight:bold;margin:7px 0}#board{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;background:#ffffff70;padding:3px;border-radius:8px}.cell{aspect-ratio:1;min-width:0;min-height:0;padding:1px;border-radius:5px;background:#fff;color:#24304b;overflow-wrap:anywhere;word-break:break-all;line-height:1.08;font-size:clamp(8px,1.85vw,14px);display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #8e9bb0;box-shadow:none}.cell.checked{background:#3bc478;color:#062b17}.cell.last{background:#ffe157;color:#2d2400}.cell.reach{background:#a17cdb;color:white}.cell.bingo{background:#ff73ba;color:#350c2d}.cell.red{background:#e95056;color:white}.cell.aqua{background:#7de5f5;color:#003c4e}.cell.darkgreen{background:#126b37;color:white}.cell.orange{background:#f69b24;color:#462600}.cell.darkblue{background:#164cbd;color:white}.cell.negi-found{outline:4px solid #00aaff!important;outline-offset:-3px;box-shadow:0 0 0 3px #fff,0 0 15px 5px #00c8ff!important;z-index:2;animation:negiPulse .9s ease-in-out infinite alternate}@keyframes negiPulse{to{filter:brightness(1.3);box-shadow:0 0 0 3px #fff,0 0 23px 8px #00c8ff}}.cell.search-hit{position:relative;outline:3px solid #27c8ff!important;outline-offset:-3px;box-shadow:inset 0 0 0 2px white,0 0 10px #21c8ff,0 0 20px #21c8ff!important;z-index:3}.cell.pick{background:#fff!important;color:#23345d!important;border:3px solid #6b7ea0}.cell.free{font-weight:900}.cell:disabled{opacity:1}.small{font-size:12px;background:#ffffffde;padding:7px;border-radius:8px;margin:8px 0}#modal{position:fixed;inset:0;z-index:50;background:#05051bdc;display:none;align-items:center;justify-content:center;padding:15px}#modal.show{display:flex}.dialog{width:min(95vw,460px);max-height:95vh;overflow:auto;background:#fff;border-radius:20px;padding:13px;box-shadow:0 20px 60px #0008}.dialog img{display:block;max-height:55vh;max-width:100%;object-fit:contain;margin:0 auto 8px}.dialog h2{font-size:21px;margin:8px 0}.dialog p{white-space:pre-line;line-height:1.5}.actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}.actions button{background:#7851c5;color:#fff;font-size:16px;padding:12px 20px}.hidden{display:none!important}#board.pickmode .cell:not(.pick){filter:brightness(.85)}
+</style></head><body><main><h1>第8回 ARK3 ビンゴ！ Ⅷ</h1><div class="toolbar"><button class="primary" id="new">🎲 カード再生成</button><button id="lock">🔓 ロック</button><button id="sound">🔊 音あり</button><button id="negiSearch">🔎 ネギサーチ</button><button class="negi" id="negi">🥬 ネギ配達！</button></div><div class="toolbar"><select id="search"><option value="">🔍 パネル検索</option></select></div><div class="stats" id="stats">読み込み中…</div><div id="board"></div><p class="small">ガーデン：2棟以上の建物 ／ パレス：1フロア20室以上の建物 ／ 該当しない地名：投資パネル<br>🥬 ネギキャンは直近のネギ配達から取り消し。安易にネギ配達ボタンは押さないこと。</p><div class="toolbar" id="bottomControls" style="margin-top:18px;padding:12px 0 24px"><button id="undo">🥬 ネギキャン</button><button id="reset" class="danger">全データリセット</button></div></main><div id="modal"><div class="dialog"><img id="scene" class="hidden" alt="イベント画像"><h2 id="mtitle"></h2><p id="mtext"></p><div class="actions" id="mactions"></div></div></div><script>
+'use strict';
+// 第8回は第7回とは別の保存領域を使用する。
+const KEY='ark3_bingo_eighth_v1', N=10, SIZE=100;
+const AREAS=['笹塚','南台','千駄ヶ谷','松濤','幡ヶ谷','松原','西新宿','西原','富ヶ谷','和田','堀之内','方南町','渋谷本町','中野本町','元代々木','弥生町','羽根木','大原','代々木','北沢','代田','初台','永福','和泉','上原','大山','大宮','神山町'];
+const NORMAL=['タワマン','ガーデン','パレス','投資パネル','アップル1','アップル2','アップル3','アップル4','バナナ1','バナナ2','バナナ3','バナナ4','キャロット1','キャロット2','キャロット3','キャロット4','荷物１つ','荷物２つ','荷物３つ','荷物４つ','階段２F','階段３F','階段４F','階段５F','階段∞','長距離3.8','近距離0.5','戸建','店舗','持ち帰り','配達なし','雨配達','オートロック２個以上','防災センター'];
+const STAFF=['矢田部さん','野田さん','金子さん','福島さん','大島さん','川田さん','萩原さん','松井さん'];
+const STATIONS=['五反田','塩浜','麻布十番','自由が丘','大森','千歳船橋','南青山','三軒茶屋','新橋','北千束'];
+// パネル検索は漢字の文字コード順ではなく、読み仮名の五十音順にする。
+const PANEL_READINGS={
+'笹塚':'ささづか','南台':'みなみだい','千駄ヶ谷':'せんだがや','松濤':'しょうとう','幡ヶ谷':'はたがや','松原':'まつばら','西新宿':'にししんじゅく','西原':'にしはら','富ヶ谷':'とみがや','和田':'わだ','堀之内':'ほりのうち','方南町':'ほうなんちょう','渋谷本町':'しぶやほんちょう','中野本町':'なかのほんちょう','元代々木':'もとよよぎ','弥生町':'やよいちょう','羽根木':'はねぎ','大原':'おおはら','代々木':'よよぎ','北沢':'きたざわ','代田':'だいた','初台':'はつだい','永福':'えいふく','和泉':'いずみ','上原':'うえはら','大山':'おおやま','大宮':'おおみや','神山町':'かみやまちょう',
+'五反田':'ごたんだ','塩浜':'しおはま','麻布十番':'あざぶじゅうばん','自由が丘':'じゆうがおか','大森':'おおもり','千歳船橋':'ちとせふなばし','南青山':'みなみあおやま','三軒茶屋':'さんげんぢゃや','新橋':'しんばし','北千束':'きたせんぞく',
+'矢田部さん':'やたべさん','野田さん':'のださん','金子さん':'かねこさん','福島さん':'ふくしまさん','大島さん':'おおしまさん','川田さん':'かわださん','萩原さん':'はぎわらさん','松井さん':'まついさん',
+'投資パネル':'とうしぱねる','防災センター':'ぼうさいせんたー','荷物１つ':'にもつ1つ','荷物２つ':'にもつ2つ','荷物３つ':'にもつ3つ','荷物４つ':'にもつ4つ','階段２F':'かいだん2f','階段３F':'かいだん3f','階段４F':'かいだん4f','階段５F':'かいだん5f','階段∞':'かいだんむげん','長距離3.8':'ちょうきょり3.8','近距離0.5':'きんきょり0.5','戸建':'こだて','店舗':'てんぽ','持ち帰り':'もちかえり','配達なし':'はいたつなし','雨配達':'あめはいたつ','オートロック２個以上':'おーとろっく2こいじょう',
+'FREE':'ふりー'
+};
+const kanaReading=s=>(PANEL_READINGS[s]||s).replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96));
+const kanaCollator=new Intl.Collator('ja',{numeric:true,sensitivity:'base'});
+const comparePanels=(a,b)=>kanaCollator.compare(kanaReading(a),kanaReading(b))||kanaCollator.compare(a,b);
+const isStation=x=>STATIONS.includes(x), random=a=>a[Math.floor(Math.random()*a.length)], shuffle=a=>{let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+const $=id=>document.getElementById(id);
+const LINES=[];for(let r=0;r<N;r++)LINES.push(Array.from({length:N},(_,c)=>r*N+c));for(let c=0;c<N;c++)LINES.push(Array.from({length:N},(_,r)=>r*N+c));LINES.push(Array.from({length:N},(_,i)=>i*N+i));LINES.push(Array.from({length:N},(_,i)=>i*N+N-1-i));
+let state,modalBusy=false,pickMode=false,negiSearchActive=false;
+let previousBingoCount=null, previousReachCount=null; // 起動時には演出しない
+const reachAudio=new Audio("syuuka.mp3"), bingoAudio=new Audio("sokuji.mp3");
+const sevenAudio=new Audio("seven.mp3"), tenAudio=new Audio("ten.mp3");
+function playGameSound(audio){if(!state?.sound)return;try{audio.pause();audio.currentTime=0;const promise=audio.play();if(promise?.catch)promise.catch(()=>{});}catch(e){}}
+function fresh(){
+  const free=Math.floor(Math.random()*SIZE);
+  const areaCount=37+Math.floor(Math.random()*8); // 37〜44枚を必ず確保
+  const stationCount=4+Math.floor(Math.random()*5); // 4〜8枚、重複可
+  const slots=shuffle(Array.from({length:SIZE},(_,i)=>i).filter(i=>i!==free));
+  const cells=Array.from({length:SIZE},()=>({name:'',checked:false,kind:'normal',hit:false}));
+  let pos=0;
+  for(let j=0;j<areaCount;j++)cells[slots[pos++]].name=random(AREAS);
+  for(let j=0;j<stationCount;j++)cells[slots[pos++]].name=random(STATIONS);
+  // スタッフを最低1枚確保。残りは通常・スタッフ候補から抽選。
+  cells[slots[pos++]].name=random(STAFF);
+  const pool=[...NORMAL,...STAFF];
+  while(pos<slots.length)cells[slots[pos++]].name=random(pool);
+  cells[free]={name:'FREE',checked:true,kind:'free',hit:false};
+  return {cells,free,initialStationCount:stationCount,initialAreaCount:areaCount,last:null,locked:false,sound:true,negiHistory:[],hits:0,hitEvents:{},event25:false,eventStation:false,event7:false,threshold:25+Math.floor(Math.random()*11),pending:null,manualCount:0};
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.cells?.length===SIZE)return s}catch(e){}return fresh()}
+function repairMissingStations(){
+  // 保存済みの盤面にステーションが0枚の場合のみ、未開封の通常マスに補充。
+  // イベント進行済みの盤面を勝手に書き換えない。
+  if(state.cells.some(c=>isStation(c.name)))return false;
+  if(state.event25||state.eventStation||state.event7||state.pending)return false;
+  const candidates=shuffle(state.cells.map((c,i)=>({c,i})).filter(({c,i})=>i!==state.free&&!c.checked&&c.kind==='normal').map(({i})=>i));
+  const names=shuffle(STATIONS).slice(0,Math.min(candidates.length,4+Math.floor(Math.random()*5)));
+  names.forEach((name,j)=>{state.cells[candidates[j]].name=name});
+  state.initialStationCount=names.length;
+  return names.length>0;
+}
+function checkedCount(){return state.cells.filter(c=>c.checked&&c.kind!=='free').length}function manualCount(){return state.cells.filter(c=>c.checked&&!['free','orange','darkblue'].includes(c.kind)).length}
+function linesStatus(){let bingo=[],reach=[];for(const line of LINES){const open=line.filter(i=>state.cells[i].checked).length;if(open===N)bingo.push(line);else if(open===N-1)reach.push(line)}return {bingo,reach}}
+function render(){let {bingo,reach}=linesStatus(),bset=new Set(bingo.flat()),rset=new Set(reach.flat());$('board').innerHTML='';state.cells.forEach((c,i)=>{let b=document.createElement('button');b.className='cell';let special=['red','aqua','darkgreen','orange','darkblue'].includes(c.kind);if(pickMode){if(!c.checked)b.classList.add('pick');else b.classList.add(c.kind==='free'?'free':c.kind==='normal'?'checked':c.kind)}else if(special)b.classList.add(c.kind);else if(bset.has(i))b.classList.add('bingo');else if(rset.has(i)&&!c.checked)b.classList.add('reach');else if(state.last===i&&c.checked)b.classList.add('last');else if(c.checked)b.classList.add('checked');if(c.kind==='free')b.classList.add('free');if(negiSearchActive&&isStation(c.name)&&!c.checked)b.classList.add('negi-found');b.textContent=c.name;b.title=`${i+1}: ${c.name}`;b.onclick=()=>pickMode?choosePanel(i):toggle(i);$('board').appendChild(b)});$('board').classList.toggle('pickmode',pickMode);$('stats').textContent=`開封 ${checkedCount()} / 99　｜　あたり ${state.hits} 枚　｜　リーチ ${reach.length}　｜　ビンゴ ${bingo.length}${bingo.length===LINES.length?' 🎉 ALL BINGO!':''}`;$('lock').textContent=state.locked?'🔒 ロック中':'🔓 ロック';$('sound').textContent=state.sound?'🔊 音あり':'🔇 消音';$('new').disabled=state.locked||pickMode;$('negi').disabled=pickMode;$('negiSearch').disabled=pickMode;$('undo').disabled=pickMode||!state.negiHistory.length;const names=[...new Set([...AREAS,...NORMAL,...STAFF,...STATIONS,"FREE",...state.cells.map(c=>c.name)])].sort(comparePanels);let v=$('search').value;$('search').innerHTML='<option value="">🔍 パネル検索</option>';for(let n of names){let o=document.createElement('option');o.value=n;o.textContent=n;$('search').appendChild(o)}$('search').value=names.includes(v)?v:'';if(v)highlight(v);updateLineEffects(bingo.length,reach.length)}
+function showBingoImage(){
+  const layer=document.createElement('div');
+  layer.style='position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;background:#07071bc9;pointer-events:none;padding:16px';
+  const img=document.createElement('img');
+  img.src='BINGO.png';img.alt='BINGO!';
+  img.style='max-width:min(95vw,520px);max-height:85vh;object-fit:contain;filter:drop-shadow(0 0 22px #fff8)';
+  img.onerror=()=>{img.remove();const fallback=document.createElement('div');fallback.textContent='🎉 BINGO!';fallback.style='background:white;border-radius:20px;padding:24px;font-size:32px;font-weight:bold';layer.appendChild(fallback)};
+  layer.appendChild(img);document.body.appendChild(layer);
+  setTimeout(()=>layer.remove(),2200);
+}
+function updateLineEffects(bingoCount,reachCount){
+  // 第6回と同様、ビンゴ優先。初回描画では鳴らさない。
+  if(previousBingoCount!==null){
+    if(bingoCount>previousBingoCount){playGameSound(bingoAudio);showBingoImage();}
+    else if(previousReachCount!==null&&reachCount>previousReachCount){playGameSound(reachAudio);}
+  }
+  previousBingoCount=bingoCount;
+  previousReachCount=reachCount;
+}
+function highlight(v){[...$('board').children].forEach((el,i)=>{el.classList.toggle('search-hit',!!v&&state.cells[i].name===v)})}
+function toggle(i){if(modalBusy||pickMode)return;let c=state.cells[i];if(['free','orange','darkblue'].includes(c.kind))return;c.checked=!c.checked;if(c.checked){if(['red','aqua'].includes(c.kind))c.kind='darkgreen';state.last=i;if(Math.random()<1/6){c.hit=true;state.hits++;showHitImage(state.hits);if(state.hits===7&&!state.hitEvents.sevenAudio){state.hitEvents.sevenAudio=true;playGameSound(sevenAudio)}if(state.hits===10&&!state.hitEvents.tenAudio){state.hitEvents.tenAudio=true;playGameSound(tenAudio)}}else c.hit=false;}else{if(c.hit){state.hits=Math.max(0,state.hits-1);c.hit=false}if(state.last===i)state.last=null;}save();render();queueEvents()}
+function showHitImage(count){
+  // 従来と同様、通常の小当たりは negi.png、5の倍数は kirakira.png。
+  const layer=document.createElement('div');
+  layer.style='position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:#07071b99;pointer-events:none;padding:16px';
+  const img=document.createElement('img');
+  img.src=count%5===0?'kirakira.png':'negi.png';img.alt='あたり！';
+  img.style='max-width:min(95vw,520px);max-height:85vh;object-fit:contain;filter:drop-shadow(0 0 20px #fff8)';
+  img.onerror=()=>{img.remove();const fallback=document.createElement('div');fallback.textContent='🎯 あたり！';fallback.style='background:white;border-radius:20px;padding:24px;font-size:28px;font-weight:bold';layer.appendChild(fallback)};
+  layer.appendChild(img);document.body.appendChild(layer);
+  setTimeout(()=>layer.remove(),1800);
+}
+function toast(msg){$('stats').title=msg;let el=document.createElement('div');el.textContent=msg;el.style='position:fixed;top:15%;left:50%;transform:translateX(-50%);background:#fff;padding:16px 28px;border-radius:15px;z-index:80;font-size:22px;box-shadow:0 5px 30px #0006';document.body.appendChild(el);setTimeout(()=>el.remove(),1600)}
+function show(title,text,img,buttons){modalBusy=true;$('mtitle').textContent=title;$('mtext').textContent=text||'';let im=$('scene');if(img){im.src=encodeURI(img);im.classList.remove('hidden');im.onerror=()=>im.classList.add('hidden')}else im.classList.add('hidden');$('mactions').innerHTML='';for(let [label,fn] of buttons){let b=document.createElement('button');b.textContent=label;b.onclick=fn;$('mactions').appendChild(b)}$('modal').classList.add('show')}
+function close(){modalBusy=false;$('modal').classList.remove('show');save();render();setTimeout(queueEvents,50)}
+function message(title,text,img,after=close){show(title,text,img,[['OK',after]])}
+function eligible(pred){return shuffle(state.cells.map((c,i)=>({c,i})).filter(({c,i})=>i!==state.free&&!c.checked&&pred(c)).map(({i})=>i))}
+function transform(indices,names,kind){indices.forEach((i,j)=>{let c=state.cells[i];c.name=names[j%names.length];c.kind=kind;c.checked=false;c.hit=false})}
+function allStationsOpen(){let a=state.cells.filter(c=>isStation(c.name));return a.length>0&&a.every(c=>c.checked)}
+function queueEvents(){if(modalBusy||pickMode||state.pending)return;if(!state.event25&&manualCount()>=state.threshold){state.event25=true;state.pending='question';save();question();return}if(!state.eventStation&&allStationsOpen()){state.eventStation=true;state.pending='station';save();stationEvent();return}if(!state.event7&&state.hits>=7){state.event7=true;state.pending='seven';save();sevenEvent();return}}
+function question(){show('最近ほかのステーションいった？','正直に答えてね！','Q.png', [['YES',()=>{let ids=eligible(c=>!isStation(c.name));let n=Math.min(ids.length,1+Math.floor(Math.random()*3));transform(ids.slice(0,n),['塩浜','新橋','麻布十番'],'red');state.pending=null;message('YES！',`${n}枚がステーションパネルに変わったよ！`,'YES.png')}],['NO',()=>{const lied=state.cells.some(c=>c.checked&&isStation(c.name)&&c.kind!=='orange');if(lied){const f=state.cells[state.free];f.name='塩浜';f.checked=false;f.kind='red';state.pending=null;message('嘘つき！','FREEが塩浜に変わっちゃった！','koto.png');return}let ids=eligible(c=>isStation(c.name));let n=Math.min(ids.length,1+Math.floor(Math.random()*3));transform(ids.slice(0,n),shuffle(STAFF),'aqua');state.pending=null;message('NO！',`${n}枚がスタッフパネルに変わったよ！`,'NO.png')}]] )}
+function stationEvent(){show('全部行ったんだのね','増やすの？ 増やさないの？','ara.png',[['増やす',()=>{let ids=eligible(()=>true);let n=Math.min(ids.length,1+Math.floor(Math.random()*3));transform(ids.slice(0,n),['塩浜','新橋','大森'],'red');state.pending=null;message('浮気者！',`${n}枚がステーションに変化！`,'up.png')}],['増やさない',()=>{let ids=eligible(()=>true);if(ids.length){let c=state.cells[ids[0]];c.checked=true;c.kind='darkblue'}state.pending=null;message('ふ～ん','未開封の1枚を開けてあげたよ。','down.png')}]] )}
+function sevenEvent(){show('あたり7枚達成！','今から二つから一つ選んでね','or.png',[['A：ステーション3枚',()=>{let ids=eligible(()=>true),{reach}=linesStatus();let priority=new Set(reach.flat().filter(i=>!state.cells[i].checked));ids.sort((a,b)=>Number(priority.has(b))-Number(priority.has(a)));let selected=ids.slice(0,3);transform(selected,Array.from({length:3},()=>random(STATIONS)),'red');state.pending=null;message('Aを選択！',`${selected.length}枚がARK3以外のステーションに変化！`,'YES.png')}],['B：笹塚への愛',()=>sevenB()]] )}
+function sevenB(){show('困難な選択だよ？','笹塚に3回もお届けだよ？ いいの？','answer.png',[['いいえ',()=>{state.pending=null;message('じゃあそのままにしとくね','今回は変化なし。','bay.png')}],['はい',()=>{const ids=eligible(()=>true).slice(0,1);transform(ids,['笹塚'],'red');state.pending='choose';save();message('そう、ちゃんと受け取ったよ！','笹塚への愛を！','thank you.png',()=>startPick())}]] )}
+function startPick(){show('選んで！好きな場所を','未開封の白いマスを1枚選んでね。','present.png',[['選択画面へ',()=>{modalBusy=false;$('modal').classList.remove('show');pickMode=true;render()}]])}
+function choosePanel(i){let c=state.cells[i];if(!pickMode)return;if(c.checked){toast('そこは違うよ！ 白いマスを選んでね');return}c.checked=true;c.kind='darkblue';pickMode=false;state.pending=null;save();render();message('プレゼント！',`${c.name} を開封したよ！`,null)}
+function negiDelivery(){if(modalBusy||pickMode)return;let ids=eligible(c=>isStation(c.name));if(!ids.length){toast('未開封のステーションがないよ');return}let i=ids[0],c=state.cells[i];state.negiHistory.push({i,kind:c.kind});c.checked=true;c.kind='orange';state.last=i;save();render();queueEvents()}
+function negiUndo(){if(modalBusy||pickMode||!state.negiHistory.length)return;let x=state.negiHistory.pop(),c=state.cells[x.i];if(c.kind==='orange'){c.checked=false;c.kind=x.kind||'normal';if(state.last===x.i)state.last=null}save();render()}
+$('negiSearch').onclick=()=>{if(modalBusy||pickMode)return;negiSearchActive=!negiSearchActive;render();};$('search').onchange=e=>highlight(e.target.value);$('negi').onclick=negiDelivery;$('undo').onclick=negiUndo;$('lock').onclick=()=>{state.locked=!state.locked;save();render()};$('sound').onclick=()=>{state.sound=!state.sound;save();render()};$('new').onclick=()=>{if(state.locked)return toast('ロックを解除してね');state=fresh();previousBingoCount=null;previousReachCount=null;save();render()};$('reset').onclick=()=>{if(!confirm('全データを消去します。元には戻せません。よろしいですか？'))return;if(!confirm('本当に全データを消しますか？'))return;localStorage.removeItem(KEY);state=fresh();previousBingoCount=null;previousReachCount=null;save();render()};
+state=load();if(repairMissingStations())save();render();if(state.pending){setTimeout(()=>{if(state.pending==='question')question();else if(state.pending==='station')stationEvent();else if(state.pending==='seven')sevenEvent();else if(state.pending==='choose')startPick()},300)}else queueEvents();
+</script></body></html>

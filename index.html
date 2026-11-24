@@ -50,6 +50,7 @@ button:disabled{opacity:.5;cursor:default}
 <body>
 <main>
 <h1>第8回 ARK3 ビンゴ！ Ⅷ</h1>
+
 <div class="toolbar">
 <button class="primary" id="new">🎲 カード再生成</button>
 <button id="lock">🔓 ロック</button>
@@ -57,21 +58,28 @@ button:disabled{opacity:.5;cursor:default}
 <button id="negiSearch">🔎 ネギサーチ</button>
 <button class="negi" id="negi">🥬 ネギ配達！</button>
 </div>
+
 <div class="toolbar">
-<select id="search"><option value="">🔍 パネル検索</option></select>
+<select id="search">
+<option value="">🔍 パネル検索</option>
+</select>
 </div>
+
 <div class="stats" id="stats">読み込み中…</div>
 <div id="board"></div>
+
 <p class="small">
 ガーデン：2棟以上の建物 ／ パレス：1フロア20室以上の建物 ／ 該当しない地名：投資パネル
 <br>
 🥬 ネギキャンは直近のネギ配達から取り消し。安易にネギ配達ボタンは押さないこと。
 </p>
+
 <div class="toolbar" id="bottomControls" style="margin-top:18px;padding:12px 0 24px">
 <button id="undo">🥬 ネギキャン</button>
 <button id="reset" class="danger">全データリセット</button>
 </div>
 </main>
+
 <div id="modal">
 <div class="dialog">
 <img id="scene" class="hidden" alt="イベント画像">
@@ -80,11 +88,14 @@ button:disabled{opacity:.5;cursor:default}
 <div class="actions" id="mactions"></div>
 </div>
 </div>
+
 <script>
 'use strict';
 
-// 第8回専用の保存領域
-const KEY='ark3_bingo_eighth_v1', N=10, SIZE=100;
+// 第8回専用の保存領域。既存データを引き継ぐため変更しない。
+const KEY='ark3_bingo_eighth_v1';
+const N=10;
+const SIZE=100;
 
 const AREAS=[
 '笹塚','南台','千駄ヶ谷','松濤','幡ヶ谷','松原',
@@ -102,7 +113,8 @@ const NORMAL=[
 '荷物１つ','荷物２つ','荷物３つ','荷物４つ',
 '階段２F','階段３F','階段４F','階段５F','階段∞',
 '長距離3.8','近距離0.5','戸建','店舗','持ち帰り',
-'配達なし','雨配達','オートロック２個以上','防災センター'
+'配達なし','雨配達','オートロック２個以上',
+'防災センター'
 ];
 
 const STAFF_BASE=[
@@ -211,7 +223,6 @@ let j=Math.floor(Math.random()*(i+1));
 return b;
 };
 
-// 萩原さんが抽選されたとき、50%で長谷川さんになる
 const staffVariant=name=>
 name==='萩原さん'&&Math.random()<0.5
 ?'長谷川さん':name;
@@ -227,8 +238,12 @@ LINES.push(Array.from({length:N},(_,r)=>r*N+c));
 LINES.push(Array.from({length:N},(_,i)=>i*N+i));
 LINES.push(Array.from({length:N},(_,i)=>i*N+N-1-i));
 
-let state,modalBusy=false,pickMode=false,negiSearchActive=false;
-let previousBingoCount=null,previousReachCount=null;
+let state;
+let modalBusy=false;
+let pickMode=false;
+let negiSearchActive=false;
+let previousBingoCount=null;
+let previousReachCount=null;
 
 const reachAudio=new Audio("syuuka.mp3");
 const bingoAudio=new Audio("sokuji.mp3");
@@ -252,9 +267,14 @@ const stationCount=4+Math.floor(Math.random()*5);
 const slots=shuffle(
 Array.from({length:SIZE},(_,i)=>i).filter(i=>i!==free)
 );
+
 const cells=Array.from({length:SIZE},()=>({
-name:'',checked:false,kind:'normal',hit:false
+name:'',
+checked:false,
+kind:'normal',
+hit:false
 }));
+
 let pos=0;
 
 for(let j=0;j<areaCount;j++)
@@ -266,15 +286,20 @@ cells[slots[pos++]].name=random(STATIONS);
 cells[slots[pos++]].name=randomStaff();
 
 const pool=[...NORMAL,...STAFF_BASE];
+
 while(pos<slots.length)
 cells[slots[pos++]].name=staffVariant(random(pool));
 
 cells[free]={
-name:'FREE',checked:true,kind:'free',hit:false
+name:'FREE',
+checked:true,
+kind:'free',
+hit:false
 };
 
 return {
-cells,free,
+cells,
+free,
 initialStationCount:stationCount,
 initialAreaCount:areaCount,
 last:null,
@@ -299,6 +324,7 @@ localStorage.setItem(KEY,JSON.stringify(state));
 function load(){
 try{
 const s=JSON.parse(localStorage.getItem(KEY));
+
 if(s&&s.cells?.length===SIZE){
 if(!s.hasegawaMigrationV1){
 for(const c of s.cells){
@@ -308,6 +334,8 @@ c.name=staffVariant(c.name);
 s.hasegawaMigrationV1=true;
 localStorage.setItem(KEY,JSON.stringify(s));
 }
+if(!s.hitEvents)s.hitEvents={};
+if(!s.negiHistory)s.negiHistory=[];
 return s;
 }
 }catch(e){}
@@ -333,6 +361,7 @@ const names=shuffle(STATIONS).slice(
 names.forEach((name,j)=>{
 state.cells[candidates[j]].name=name;
 });
+
 state.initialStationCount=names.length;
 return names.length>0;
 }
@@ -351,6 +380,7 @@ c.checked&&!['free','orange','darkblue'].includes(c.kind)
 
 function linesStatus(){
 let bingo=[],reach=[];
+
 for(const line of LINES){
 const open=line.filter(i=>state.cells[i].checked).length;
 if(open===N)bingo.push(line);
@@ -363,6 +393,7 @@ function render(){
 let {bingo,reach}=linesStatus();
 let bset=new Set(bingo.flat());
 let rset=new Set(reach.flat());
+
 $('board').innerHTML='';
 
 state.cells.forEach((c,i)=>{
@@ -478,15 +509,25 @@ el.classList.toggle(
 });
 }
 
+// ★ 赤・水色マスの開封取り消しに対応
 function toggle(i){
 if(modalBusy||pickMode)return;
-let c=state.cells[i];
-if(['free','orange','darkblue'].includes(c.kind))return;
+
+const c=state.cells[i];
+
+if(['free','orange','darkblue'].includes(c.kind))
+return;
 
 c.checked=!c.checked;
 
 if(c.checked){
-if(['red','aqua'].includes(c.kind))c.kind='darkgreen';
+
+// 赤・水色の元の色を保存する
+if(['red','aqua'].includes(c.kind)){
+c.originalTransformKind=c.kind;
+c.kind='darkgreen';
+}
+
 state.last=i;
 
 if(Math.random()<1/6){
@@ -504,13 +545,24 @@ state.hitEvents.tenAudio=true;
 playGameSound(tenAudio);
 }
 
-}else c.hit=false;
+}else{
+c.hit=false;
+}
 
 }else{
+
+// 開封を取り消した場合は元の色に戻す
+if(c.kind==='darkgreen'){
+c.kind=c.originalTransformKind==='aqua'?'aqua':'red';
+delete c.originalTransformKind;
+}
+
+// あたりが出ていた場合は取り消す
 if(c.hit){
 state.hits=Math.max(0,state.hits-1);
 c.hit=false;
 }
+
 if(state.last===i)state.last=null;
 }
 
@@ -602,6 +654,7 @@ c.name=names[j%names.length];
 c.kind=kind;
 c.checked=false;
 c.hit=false;
+delete c.originalTransformKind;
 });
 }
 

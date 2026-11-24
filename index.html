@@ -167,8 +167,6 @@ button:disabled{
 }
 .hidden{display:none!important}
 #board.pickmode .cell:not(.pick){filter:brightness(.85)}
-
-/* 下部のボタンはスマホでも横3列 */
 #bottomControls{
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
@@ -205,7 +203,6 @@ button:disabled{
 </div>
 
 <div class="stats" id="stats">読み込み中…</div>
-
 <div id="board"></div>
 
 <p class="small">
@@ -214,6 +211,7 @@ button:disabled{
 該当しない地名：投資パネル
 <br>
 🥬 ネギキャンは直近のネギ配達から取り消し。
+濃い青マスは3回連続タップで取り消し確認。
 </p>
 
 <div id="bottomControls">
@@ -225,7 +223,6 @@ button:disabled{
 全データリセット
 </button>
 </div>
-
 </main>
 
 <div id="modal">
@@ -361,7 +358,6 @@ kanaCollator.compare(kanaReading(a),kanaReading(b))||
 kanaCollator.compare(a,b);
 
 const isStation=x=>STATIONS.includes(x);
-
 const random=a=>a[Math.floor(Math.random()*a.length)];
 
 const shuffle=a=>{
@@ -378,7 +374,6 @@ name==='萩原さん'&&Math.random()<0.5
 ?'長谷川さん':name;
 
 const randomStaff=()=>staffVariant(random(STAFF_BASE));
-
 const $=id=>document.getElementById(id);
 
 const LINES=[];
@@ -398,6 +393,10 @@ let pickMode=false;
 let negiSearchActive=false;
 let previousBingoCount=null;
 let previousReachCount=null;
+
+// 濃い青マスの3回タップ管理
+let blueTapIndex=-1;
+let blueTapCount=0;
 
 const reachAudio=new Audio('syuuka.mp3');
 const bingoAudio=new Audio('sokuji.mp3');
@@ -628,21 +627,18 @@ function render(){
   state.sound?'🔊 音あり':'🔇 消音';
 
  $('new').disabled=state.locked||pickMode;
-
  $('negi').disabled=pickMode;
  $('negiSearch').disabled=pickMode;
 
  $('undo').disabled=
   pickMode||!state.negiHistory.length;
 
- // ロック中はイベント取消を禁止
  $('undoStationEvent').disabled=
   state.locked||
   pickMode||
   modalBusy||
   !state.eventStation;
 
- // ロック中は全データリセットを禁止
  $('reset').disabled=
   state.locked||
   pickMode||
@@ -729,13 +725,59 @@ function highlight(v){
  });
 }
 
-// 赤・水色マスの開封取消に対応
+// 濃い青マスを3回連続タップで解除
+function handleBlueTap(i){
+ if(modalBusy||pickMode)return;
+
+ if(blueTapIndex===i){
+  blueTapCount++;
+ }else{
+  blueTapIndex=i;
+  blueTapCount=1;
+ }
+
+ if(blueTapCount<3)return;
+
+ blueTapIndex=-1;
+ blueTapCount=0;
+
+ if(!confirm(
+  'この濃い青マスの自動開封を取り消しますか？'
+ ))return;
+
+ const c=state.cells[i];
+
+ if(c.kind!=='darkblue'||!c.checked)return;
+
+ c.checked=false;
+ c.kind='normal';
+ c.hit=false;
+
+ if(state.last===i){
+  state.last=null;
+ }
+
+ // イベント発生済みフラグは変更しない
+ save();
+ render();
+}
+
+// 通常マス・赤マス・水色マスの開閉
 function toggle(i){
  if(modalBusy||pickMode)return;
 
  const c=state.cells[i];
 
- if(['free','orange','darkblue'].includes(c.kind))
+ if(c.kind==='darkblue'){
+  handleBlueTap(i);
+  return;
+ }
+
+ // ほかのマスを押したら3回タップをリセット
+ blueTapIndex=-1;
+ blueTapCount=0;
+
+ if(['free','orange'].includes(c.kind))
   return;
 
  c.checked=!c.checked;
@@ -1004,7 +1046,6 @@ function question(){
  );
 }
 
-// 全ステーション達成イベント
 function stationEvent(){
  show(
   '全部行ったんだのね',
@@ -1041,7 +1082,6 @@ function stationEvent(){
      let i=ids[0];
      let c=state.cells[i];
 
-     // 今後のイベント用に自動開封履歴を保存
      state.stationEventUndo={
       index:i,
       name:c.name,
@@ -1065,9 +1105,9 @@ function stationEvent(){
  );
 }
 
-// 全ステーションイベント取り消し
+// イベント取消ボタン
+// 古いイベントについては対象が不明な場合、変更しない
 function undoStationEvent(){
-
  if(modalBusy||pickMode||state.locked)return;
 
  if(!state.eventStation){
@@ -1075,120 +1115,46 @@ function undoStationEvent(){
   return;
  }
 
- // 自由が丘の誤開封を特定
- const jiyugaoka=state.cells
-  .map((c,i)=>({c,i}))
-  .filter(({c})=>
-   c.name==='自由が丘'&&
-   c.checked&&
-   c.kind!=='orange'
-  );
+ const history=state.stationEventUndo;
 
- if(jiyugaoka.length!==1){
+ if(
+  !history||
+  !Number.isInteger(history.index)||
+  !state.cells[history.index]||
+  state.cells[history.index].kind!=='darkblue'||
+  !state.cells[history.index].checked
+ ){
   alert(
-   '自由が丘の対象マスを一つに特定できません。\n'+
+   'このイベントの自動開封履歴を特定できません。\n'+
+   '濃い青マスを3回タップすると、\n'+
+   'そのマスだけを取り消せます。\n'+
    'カードは変更していません。'
   );
   return;
  }
 
- const stationIndex=jiyugaoka[0].i;
+ const c=state.cells[history.index];
 
- // 新版で履歴があれば履歴を優先。
- // 旧版のイベントは神山町の青マスを確認する。
- let panelIndex=-1;
- let previousKind='normal';
+ if(!confirm(
+  `${c.name} のイベント開封を取り消しますか？\n\n`+
+  'イベントの発生済み状態も解除します。'
+ ))return;
 
- const history=state.stationEventUndo;
+ c.checked=history.previousChecked;
+ c.kind=history.previousKind||'normal';
+ c.hit=false;
 
- if(
-  history&&
-  Number.isInteger(history.index)&&
-  state.cells[history.index]?.checked&&
-  state.cells[history.index]?.kind==='darkblue'
- ){
-  panelIndex=history.index;
-  previousKind=history.previousKind||'normal';
- }else{
-  const candidates=state.cells
-   .map((c,i)=>({c,i}))
-   .filter(({c})=>
-    c.name==='神山町'&&
-    c.checked&&
-    c.kind==='darkblue'
-   );
-
-  if(candidates.length!==1){
-   alert(
-    '神山町の自動開封マスを特定できません。\n'+
-    'カードは変更していません。'
-   );
-   return;
-  }
-
-  panelIndex=candidates[0].i;
- }
-
- if(panelIndex===stationIndex){
-  alert('対象マスの判定に問題があります。');
-  return;
- }
-
- const ok=confirm(
-  '全ステーション達成イベントを取り消しますか？\n\n'+
-  '・自由が丘を未開封に戻す\n'+
-  '・イベントの自動開封マスを戻す\n'+
-  '・イベントを未発生に戻す\n\n'+
-  'ほかのマスは変更しません。'
- );
-
- if(!ok)return;
-
- // 自由が丘を未開封にする
- const station=state.cells[stationIndex];
-
- station.checked=false;
-
- if(station.kind==='darkgreen'){
-  station.kind=
-   station.originalTransformKind==='aqua'
-   ?'aqua':'red';
-
-  delete station.originalTransformKind;
- }
-
- if(station.hit){
-  state.hits=Math.max(0,state.hits-1);
-  station.hit=false;
- }
-
- // 神山町など自動開封されたマスを元に戻す
- const panel=state.cells[panelIndex];
-
- panel.checked=false;
- panel.kind=previousKind;
- panel.hit=false;
-
- // イベントを未発生に戻す
  state.eventStation=false;
- state.pending=null;
  state.stationEventUndo=null;
+ state.pending=null;
 
- if(
-  state.last===stationIndex||
-  state.last===panelIndex
- ){
+ if(state.last===history.index)
   state.last=null;
- }
 
  save();
  render();
 
- alert(
-  'イベントを取り消しました！\n\n'+
-  '自由が丘と自動開封マスを未開封に戻しました。\n'+
-  '全ステーション達成イベントは再挑戦できます。'
- );
+ alert('イベントを取り消しました。');
 }
 
 function sevenEvent(){
@@ -1374,8 +1340,6 @@ $('search').onchange=e=>
 
 $('negi').onclick=negiDelivery;
 $('undo').onclick=negiUndo;
-
-// イベント取り消しボタン
 $('undoStationEvent').onclick=undoStationEvent;
 
 $('lock').onclick=()=>{
@@ -1402,7 +1366,6 @@ $('new').onclick=()=>{
  render();
 };
 
-// ロック中は全データリセット不可
 $('reset').onclick=()=>{
  if(
   state.locked||
@@ -1453,7 +1416,6 @@ if(state.pending){
 }else{
  queueEvents();
 }
-
 </script>
 </body>
 </html>

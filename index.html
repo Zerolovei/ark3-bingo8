@@ -8,7 +8,6 @@
 
 <style>
 *{box-sizing:border-box}
-
 body{
  margin:0;
  background:#d9eaff url('bac.png') center top/cover fixed;
@@ -16,343 +15,151 @@ body{
  text-align:center;
  color:#1d2340;
 }
-
-main{
- max-width:850px;
- margin:auto;
- padding:12px 5px 45px;
-}
-
-h1{
- color:white;
- text-shadow:0 3px 8px #182048;
- margin:8px 0;
-}
-
+main{max-width:850px;margin:auto;padding:12px 5px 45px}
+h1{color:white;text-shadow:0 3px 8px #182048;margin:8px 0}
 .toolbar{
- display:flex;
- flex-wrap:wrap;
- justify-content:center;
- gap:6px;
- margin:8px 0;
+ display:flex;flex-wrap:wrap;justify-content:center;
+ gap:6px;margin:8px 0
 }
-
 button,select{
- border:0;
- border-radius:12px;
- padding:9px 11px;
- font-weight:bold;
- cursor:pointer;
- background:#fff;
- color:#253354;
- box-shadow:0 2px 5px #0002;
+ border:0;border-radius:12px;padding:9px 11px;
+ font-weight:bold;cursor:pointer;background:#fff;
+ color:#253354;box-shadow:0 2px 5px #0002
 }
-
-button:disabled{
- opacity:.4;
- cursor:default;
-}
-
-.primary{
- background:#8254d6;
- color:white;
-}
-
-.negi{
- background:#ef9d38;
- color:#251300;
-}
-
-.danger{
- background:#a33358;
- color:white;
-}
-
+button:disabled{opacity:.4;cursor:default}
+.primary{background:#8254d6;color:white}
+.negi{background:#ef9d38;color:#251300}
+.danger{background:#a33358;color:white}
 .stats{
- background:#ffffffd9;
- border-radius:12px;
- padding:8px;
- font-weight:bold;
- margin:7px 0;
+ background:#ffffffd9;border-radius:12px;
+ padding:8px;font-weight:bold;margin:7px 0
 }
-
 #board{
  display:grid;
  grid-template-columns:repeat(10,minmax(0,1fr));
- gap:2px;
- background:#ffffff70;
- padding:3px;
- border-radius:8px;
+ gap:2px;background:#ffffff70;
+ padding:3px;border-radius:8px
 }
-
 .cell{
- aspect-ratio:1;
- min-width:0;
- min-height:0;
- padding:1px;
- border-radius:5px;
- background:#fff;
- color:#24304b;
- overflow-wrap:anywhere;
- word-break:break-all;
- line-height:1.08;
+ aspect-ratio:1;min-width:0;min-height:0;
+ padding:1px;border-radius:5px;background:#fff;
+ color:#24304b;overflow-wrap:anywhere;
+ word-break:break-all;line-height:1.08;
  font-size:clamp(8px,1.85vw,14px);
- display:flex;
- align-items:center;
- justify-content:center;
- position:relative;
- border:1px solid #8e9bb0;
- box-shadow:none;
+ display:flex;align-items:center;justify-content:center;
+ position:relative;border:1px solid #8e9bb0;
+ box-shadow:none
 }
+.cell.checked{background:#3bc478;color:#062b17}
+.cell.last{background:#ffe157;color:#2d2400}
+.cell.reach{background:#a17cdb;color:white}
+.cell.bingo{background:#ff73ba;color:#350c2d}
+.cell.red{background:#e95056;color:white}
+.cell.aqua{background:#7de5f5;color:#003c4e}
+.cell.darkgreen{background:#126b37;color:white}
+.cell.orange{background:#f69b24;color:#462600}
+.cell.darkblue{background:#164cbd;color:white}
+.cell.free{font-weight:900}
+.cell:disabled{opacity:1}
 
-.cell.checked{
- background:#3bc478;
- color:#062b17;
-}
-
-.cell.last{
- background:#ffe157;
- color:#2d2400;
-}
-
-.cell.reach{
- background:#a17cdb;
- color:white;
-}
-
-.cell.bingo{
- background:#ff73ba;
- color:#350c2d;
-}
-
-.cell.red{
- background:#e95056;
- color:white;
-}
-
-.cell.aqua{
- background:#7de5f5;
- color:#003c4e;
-}
-
-.cell.darkgreen{
- background:#126b37;
- color:white;
-}
-
-.cell.orange{
- background:#f69b24;
- color:#462600;
-}
-
-.cell.darkblue{
- background:#164cbd;
- color:white;
-}
-
-/* 新イベント：愛パネル */
+/* 愛❤️パネル */
 .cell.love{
- background:#ffb1d8;
- color:#8a104b;
- font-weight:900;
- border:2px solid #f45a9c;
+ background:#ffb1d8;color:#8a104b;
+ font-weight:900;border:2px solid #f45a9c
 }
-
-.cell.love.checked{
- background:#ff74b6;
- color:#690b3c;
-}
-
-.cell.love.last{
- background:#ffe157;
- color:#690b3c;
-}
-
-.cell.love.bingo{
- background:#ff73ba;
- color:#350c2d;
-}
-
-.cell.free{
- font-weight:900;
-}
-
-.cell:disabled{
- opacity:1;
-}
+.cell.love.checked{background:#ff74b6;color:#690b3c}
+.cell.love.last{background:#ffe157;color:#690b3c}
+.cell.love.bingo{background:#ff73ba;color:#350c2d}
 
 .cell.negi-found{
  outline:4px solid #00aaff!important;
  outline-offset:-3px;
- box-shadow:
-  0 0 0 3px #fff,
-  0 0 15px 5px #00c8ff!important;
- z-index:2;
- animation:negiPulse .9s ease-in-out infinite alternate;
+ box-shadow:0 0 0 3px #fff,0 0 15px 5px #00c8ff!important;
+ z-index:2;animation:negiPulse .9s ease-in-out infinite alternate
 }
-
 @keyframes negiPulse{
  to{
   filter:brightness(1.3);
-  box-shadow:
-   0 0 0 3px #fff,
-   0 0 23px 8px #00c8ff;
+  box-shadow:0 0 0 3px #fff,0 0 23px 8px #00c8ff
  }
 }
-
 .cell.search-hit{
  outline:3px solid #27c8ff!important;
  outline-offset:-3px;
- box-shadow:
-  inset 0 0 0 2px white,
-  0 0 10px #21c8ff,
-  0 0 20px #21c8ff!important;
- z-index:3;
+ box-shadow:inset 0 0 0 2px white,0 0 10px #21c8ff,
+ 0 0 20px #21c8ff!important;
+ z-index:3
 }
-
 .cell.pick{
- background:#fff!important;
- color:#23345d!important;
- border:3px solid #6b7ea0;
+ background:#fff!important;color:#23345d!important;
+ border:3px solid #6b7ea0
 }
-
 .small{
- font-size:12px;
- background:#ffffffde;
- padding:7px;
- border-radius:8px;
- margin:8px 0;
+ font-size:12px;background:#ffffffde;
+ padding:7px;border-radius:8px;margin:8px 0
 }
-
 #modal{
- position:fixed;
- inset:0;
- z-index:50;
- background:#05051bdc;
- display:none;
- align-items:center;
- justify-content:center;
- padding:15px;
+ position:fixed;inset:0;z-index:50;
+ background:#05051bdc;display:none;
+ align-items:center;justify-content:center;padding:15px
 }
-
-#modal.show{
- display:flex;
-}
-
+#modal.show{display:flex}
 .dialog{
- width:min(95vw,460px);
- max-height:95vh;
- overflow:auto;
- background:#fff;
- border-radius:20px;
- padding:13px;
- box-shadow:0 20px 60px #0008;
+ width:min(95vw,460px);max-height:95vh;
+ overflow:auto;background:#fff;border-radius:20px;
+ padding:13px;box-shadow:0 20px 60px #0008
 }
-
 .dialog img{
- display:block;
- max-height:55vh;
- max-width:100%;
- object-fit:contain;
- margin:0 auto 8px;
+ display:block;max-height:55vh;max-width:100%;
+ object-fit:contain;margin:0 auto 8px
 }
-
-.dialog h2{
- font-size:21px;
- margin:8px 0;
-}
-
-.dialog p{
- white-space:pre-line;
- line-height:1.5;
-}
-
+.dialog h2{font-size:21px;margin:8px 0}
+.dialog p{white-space:pre-line;line-height:1.5}
 .actions{
- display:flex;
- justify-content:center;
- gap:9px;
- flex-wrap:wrap;
+ display:flex;justify-content:center;
+ gap:9px;flex-wrap:wrap
 }
-
 .actions button{
- background:#7851c5;
- color:#fff;
- font-size:16px;
- padding:12px 20px;
+ background:#7851c5;color:#fff;
+ font-size:16px;padding:12px 20px
 }
-
-.hidden{
- display:none!important;
-}
-
-#board.pickmode .cell:not(.pick){
- filter:brightness(.85);
-}
-
+.hidden{display:none!important}
+#board.pickmode .cell:not(.pick){filter:brightness(.85)}
 #bottomControls{
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
- gap:4px;
- margin-top:18px;
- padding:12px 0 24px;
+ gap:4px;margin-top:18px;padding:12px 0 24px
 }
-
 #bottomControls button{
- min-width:0;
- padding:10px 2px;
+ min-width:0;padding:10px 2px;
  font-size:clamp(9px,2.8vw,13px);
- line-height:1.3;
- white-space:normal;
+ line-height:1.3;white-space:normal
 }
 
-/* 今回の更新確認マーク：青いα */
+/* 更新確認：紫α */
 #updateMark{
- position:fixed;
- top:8px;
- right:8px;
- z-index:100;
- color:#0066ff;
- font-size:28px;
- font-weight:900;
+ position:fixed;top:8px;right:8px;z-index:100;
+ color:#9933ff;font-size:28px;font-weight:900;
  line-height:1;
- text-shadow:
-  1px 1px 2px white,
-  -1px -1px 2px white,
-  0 0 6px white;
- pointer-events:none;
+ text-shadow:1px 1px 2px white,-1px -1px 2px white,
+ 0 0 6px white;
+ pointer-events:none
 }
-
 </style>
 </head>
 
 <body>
-
 <div id="updateMark">α</div>
 
 <main>
-
 <h1>第8回 ARK3 ビンゴ！ Ⅷ</h1>
 
 <div class="toolbar">
-<button class="primary" id="new">
-🎲 カード再生成
-</button>
-
-<button id="lock">
-🔓 ロック
-</button>
-
-<button id="sound">
-🔊 音あり
-</button>
-
-<button id="negiSearch">
-🔎 ネギサーチ
-</button>
-
-<button class="negi" id="negi">
-🥬 ネギ配達！
-</button>
+<button class="primary" id="new">🎲 カード再生成</button>
+<button id="lock">🔓 ロック</button>
+<button id="sound">🔊 音あり</button>
+<button id="negiSearch">🔎 ネギサーチ</button>
+<button class="negi" id="negi">🥬 ネギ配達！</button>
 </div>
 
 <div class="toolbar">
@@ -361,10 +168,7 @@ button:disabled{
 </select>
 </div>
 
-<div class="stats" id="stats">
-読み込み中…
-</div>
-
+<div class="stats" id="stats">読み込み中…</div>
 <div id="board"></div>
 
 <p class="small">
@@ -375,24 +179,13 @@ button:disabled{
 🥬 ネギキャンは直近のネギ配達から取り消し。
 <br>
 濃い青マスは3回連続タップで取り消し確認。
-<br>
-愛❤️は通常開封の特別パネル。
 </p>
 
 <div id="bottomControls">
-<button id="undo">
-🥬 ネギキャン
-</button>
-
-<button id="undoStationEvent" class="danger">
-↩️ イベント取消
-</button>
-
-<button id="reset" class="danger">
-全データリセット
-</button>
+<button id="undo">🥬 ネギキャン</button>
+<button id="undoStationEvent" class="danger">↩️ イベント取消</button>
+<button id="reset" class="danger">全データリセット</button>
 </div>
-
 </main>
 
 <div id="modal">
@@ -407,264 +200,135 @@ button:disabled{
 <script>
 'use strict';
 
-/*
- 第8回 ARK3ビンゴ
- 更新版：青α
-
- 追加：
- スタッフパネル制覇！
- 50/50チャレンジ
-
- 実際の確率：
- スタッフ 50%
- ステーション 20%
- 愛❤️ 30%
-*/
-
 const KEY='ark3_bingo_eighth_v1';
 const N=10;
 const SIZE=100;
 
 const AREAS=[
- '笹塚',
- '南台',
- '千駄ヶ谷',
- '松濤',
- '幡ヶ谷',
- '松原',
- '西新宿',
- '西原',
- '富ヶ谷',
- '和田',
- '堀之内',
- '方南町',
- '渋谷本町',
- '中野本町',
- '元代々木',
- '弥生町',
- '羽根木',
- '大原',
- '代々木',
- '北沢',
- '代田',
- '初台',
- '永福',
- '和泉',
- '上原',
- '大山',
- '大宮',
- '神山町'
+'笹塚','南台','千駄ヶ谷','松濤','幡ヶ谷','松原',
+'西新宿','西原','富ヶ谷','和田','堀之内','方南町',
+'渋谷本町','中野本町','元代々木','弥生町','羽根木',
+'大原','代々木','北沢','代田','初台','永福','和泉',
+'上原','大山','大宮','神山町'
 ];
 
 const NORMAL=[
- 'タワマン',
- 'ガーデン',
- 'パレス',
- '投資パネル',
- 'アップル1',
- 'アップル2',
- 'アップル3',
- 'アップル4',
- 'バナナ1',
- 'バナナ2',
- 'バナナ3',
- 'バナナ4',
- 'キャロット1',
- 'キャロット2',
- 'キャロット3',
- 'キャロット4',
- '荷物１つ',
- '荷物２つ',
- '荷物３つ',
- '荷物４つ',
- '階段２F',
- '階段３F',
- '階段４F',
- '階段５F',
- '階段∞',
- '長距離3.8',
- '近距離0.5',
- '戸建',
- '店舗',
- '持ち帰り',
- '配達なし',
- '雨配達',
- 'オートロック２個以上',
- '防災センター'
+'タワマン','ガーデン','パレス','投資パネル',
+'アップル1','アップル2','アップル3','アップル4',
+'バナナ1','バナナ2','バナナ3','バナナ4',
+'キャロット1','キャロット2','キャロット3','キャロット4',
+'荷物１つ','荷物２つ','荷物３つ','荷物４つ',
+'階段２F','階段３F','階段４F','階段５F','階段∞',
+'長距離3.8','近距離0.5','戸建','店舗','持ち帰り',
+'配達なし','雨配達','オートロック２個以上',
+'防災センター'
 ];
 
 const STAFF_BASE=[
- '矢田部さん',
- '野田さん',
- '金子さん',
- '福島さん',
- '大島さん',
- '川田さん',
- '萩原さん',
- '松井さん'
+'矢田部さん','野田さん','金子さん','福島さん',
+'大島さん','川田さん','萩原さん','松井さん'
 ];
 
-const STAFF=[
- ...STAFF_BASE,
- '長谷川さん'
-];
+const STAFF=[...STAFF_BASE,'長谷川さん'];
 
 const STATIONS=[
- '五反田',
- '塩浜',
- '麻布十番',
- '自由が丘',
- '大森',
- '千歳船橋',
- '南青山',
- '三軒茶屋',
- '新橋',
- '北千束'
+'五反田','塩浜','麻布十番','自由が丘','大森',
+'千歳船橋','南青山','三軒茶屋','新橋','北千束'
 ];
 
 const PANEL_READINGS={
- '笹塚':'ささづか',
- '南台':'みなみだい',
- '千駄ヶ谷':'せんだがや',
- '松濤':'しょうとう',
- '幡ヶ谷':'はたがや',
- '松原':'まつばら',
- '西新宿':'にししんじゅく',
- '西原':'にしはら',
- '富ヶ谷':'とみがや',
- '和田':'わだ',
- '堀之内':'ほりのうち',
- '方南町':'ほうなんちょう',
- '渋谷本町':'しぶやほんちょう',
- '中野本町':'なかのほんちょう',
- '元代々木':'もとよよぎ',
- '弥生町':'やよいちょう',
- '羽根木':'はねぎ',
- '大原':'おおはら',
- '代々木':'よよぎ',
- '北沢':'きたざわ',
- '代田':'だいた',
- '初台':'はつだい',
- '永福':'えいふく',
- '和泉':'いずみ',
- '上原':'うえはら',
- '大山':'おおやま',
- '大宮':'おおみや',
- '神山町':'かみやまちょう',
- '五反田':'ごたんだ',
- '塩浜':'しおはま',
- '麻布十番':'あざぶじゅうばん',
- '自由が丘':'じゆうがおか',
- '大森':'おおもり',
- '千歳船橋':'ちとせふなばし',
- '南青山':'みなみあおやま',
- '三軒茶屋':'さんげんぢゃや',
- '新橋':'しんばし',
- '北千束':'きたせんぞく',
- '矢田部さん':'やたべさん',
- '野田さん':'のださん',
- '金子さん':'かねこさん',
- '福島さん':'ふくしまさん',
- '大島さん':'おおしまさん',
- '川田さん':'かわださん',
- '萩原さん':'はぎわらさん',
- '長谷川さん':'はせがわさん',
- '松井さん':'まついさん',
- '投資パネル':'とうしぱねる',
- '防災センター':'ぼうさいせんたー',
- '荷物１つ':'にもつ1つ',
- '荷物２つ':'にもつ2つ',
- '荷物３つ':'にもつ3つ',
- '荷物４つ':'にもつ4つ',
- '階段２F':'かいだん2f',
- '階段３F':'かいだん3f',
- '階段４F':'かいだん4f',
- '階段５F':'かいだん5f',
- '階段∞':'かいだんむげん',
- '長距離3.8':'ちょうきょり3.8',
- '近距離0.5':'きんきょり0.5',
- '戸建':'こだて',
- '店舗':'てんぽ',
- '持ち帰り':'もちかえり',
- '配達なし':'はいたつなし',
- '雨配達':'あめはいたつ',
- 'オートロック２個以上':'おーとろっく2こいじょう',
- 'FREE':'ふりー',
- '愛❤️':'あい'
+'笹塚':'ささづか','南台':'みなみだい',
+'千駄ヶ谷':'せんだがや','松濤':'しょうとう',
+'幡ヶ谷':'はたがや','松原':'まつばら',
+'西新宿':'にししんじゅく','西原':'にしはら',
+'富ヶ谷':'とみがや','和田':'わだ',
+'堀之内':'ほりのうち','方南町':'ほうなんちょう',
+'渋谷本町':'しぶやほんちょう',
+'中野本町':'なかのほんちょう',
+'元代々木':'もとよよぎ','弥生町':'やよいちょう',
+'羽根木':'はねぎ','大原':'おおはら',
+'代々木':'よよぎ','北沢':'きたざわ',
+'代田':'だいた','初台':'はつだい',
+'永福':'えいふく','和泉':'いずみ',
+'上原':'うえはら','大山':'おおやま',
+'大宮':'おおみや','神山町':'かみやまちょう',
+'五反田':'ごたんだ','塩浜':'しおはま',
+'麻布十番':'あざぶじゅうばん',
+'自由が丘':'じゆうがおか','大森':'おおもり',
+'千歳船橋':'ちとせふなばし',
+'南青山':'みなみあおやま',
+'三軒茶屋':'さんげんぢゃや',
+'新橋':'しんばし','北千束':'きたせんぞく',
+'矢田部さん':'やたべさん','野田さん':'のださん',
+'金子さん':'かねこさん','福島さん':'ふくしまさん',
+'大島さん':'おおしまさん','川田さん':'かわださん',
+'萩原さん':'はぎわらさん',
+'長谷川さん':'はせがわさん','松井さん':'まついさん',
+'投資パネル':'とうしぱねる',
+'防災センター':'ぼうさいせんたー',
+'荷物１つ':'にもつ1つ','荷物２つ':'にもつ2つ',
+'荷物３つ':'にもつ3つ','荷物４つ':'にもつ4つ',
+'階段２F':'かいだん2f','階段３F':'かいだん3f',
+'階段４F':'かいだん4f','階段５F':'かいだん5f',
+'階段∞':'かいだんむげん',
+'長距離3.8':'ちょうきょり3.8',
+'近距離0.5':'きんきょり0.5',
+'戸建':'こだて','店舗':'てんぽ',
+'持ち帰り':'もちかえり','配達なし':'はいたつなし',
+'雨配達':'あめはいたつ',
+'オートロック２個以上':'おーとろっく2こいじょう',
+'FREE':'ふりー'
 };
 
 const kanaReading=s=>
- (PANEL_READINGS[s]||s).replace(
-  /[ァ-ヶ]/g,
-  c=>String.fromCharCode(c.charCodeAt(0)-96)
- );
+ (PANEL_READINGS[s]||s).replace(/[ァ-ヶ]/g,c=>
+ String.fromCharCode(c.charCodeAt(0)-96));
 
 const kanaCollator=new Intl.Collator('ja',{
- numeric:true,
- sensitivity:'base'
+ numeric:true,sensitivity:'base'
 });
 
 const comparePanels=(a,b)=>
  kanaCollator.compare(kanaReading(a),kanaReading(b))||
  kanaCollator.compare(a,b);
 
-const isStation=name=>STATIONS.includes(name);
-const isStaff=name=>STAFF.includes(name);
-
-const random=a=>
- a[Math.floor(Math.random()*a.length)];
+const isStation=x=>STATIONS.includes(x);
+const isStaff=x=>STAFF.includes(x);
+const random=a=>a[Math.floor(Math.random()*a.length)];
 
 const shuffle=a=>{
  const b=[...a];
-
  for(let i=b.length-1;i>0;i--){
   const j=Math.floor(Math.random()*(i+1));
   [b[i],b[j]]=[b[j],b[i]];
  }
-
  return b;
 };
 
 const staffVariant=name=>
  name==='萩原さん'&&Math.random()<0.5
- ?'長谷川さん'
- :name;
+ ?'長谷川さん':name;
 
 const randomStaff=()=>staffVariant(random(STAFF_BASE));
-
 const $=id=>document.getElementById(id);
 
 const LINES=[];
 
-for(let r=0;r<N;r++){
- LINES.push(
-  Array.from({length:N},(_,c)=>r*N+c)
- );
-}
+for(let r=0;r<N;r++)
+ LINES.push(Array.from({length:N},(_,c)=>r*N+c));
 
-for(let c=0;c<N;c++){
- LINES.push(
-  Array.from({length:N},(_,r)=>r*N+c)
- );
-}
+for(let c=0;c<N;c++)
+ LINES.push(Array.from({length:N},(_,r)=>r*N+c));
 
-LINES.push(
- Array.from({length:N},(_,i)=>i*N+i)
-);
-
-LINES.push(
- Array.from({length:N},(_,i)=>i*N+N-1-i)
-);
+LINES.push(Array.from({length:N},(_,i)=>i*N+i));
+LINES.push(Array.from({length:N},(_,i)=>i*N+N-1-i));
 
 let state;
-
 let modalBusy=false;
 let pickMode=false;
 let negiSearchActive=false;
-
 let previousBingoCount=null;
 let previousReachCount=null;
-
 let blueTapIndex=-1;
 let blueTapCount=0;
 
@@ -675,184 +339,101 @@ const tenAudio=new Audio('ten.mp3');
 
 function playGameSound(audio){
  if(!state?.sound)return;
-
  try{
   audio.pause();
   audio.currentTime=0;
-
-  const promise=audio.play();
-
-  if(promise?.catch){
-   promise.catch(()=>{});
-  }
+  const p=audio.play();
+  if(p?.catch)p.catch(()=>{});
  }catch(e){}
 }
 
-/* 新規カード */
-
 function fresh(){
  const free=Math.floor(Math.random()*SIZE);
-
- const areaCount=
-  37+Math.floor(Math.random()*8);
-
- const stationCount=
-  4+Math.floor(Math.random()*5);
+ const areaCount=37+Math.floor(Math.random()*8);
+ const stationCount=4+Math.floor(Math.random()*5);
 
  const slots=shuffle(
-  Array.from({length:SIZE},(_,i)=>i)
-   .filter(i=>i!==free)
+  Array.from({length:SIZE},(_,i)=>i).filter(i=>i!==free)
  );
 
- const cells=Array.from(
-  {length:SIZE},
-  ()=>({
-   name:'',
-   checked:false,
-   kind:'normal',
-   hit:false
-  })
- );
+ const cells=Array.from({length:SIZE},()=>({
+  name:'',checked:false,kind:'normal',hit:false
+ }));
 
  let pos=0;
 
- for(let j=0;j<areaCount;j++){
+ for(let j=0;j<areaCount;j++)
   cells[slots[pos++]].name=random(AREAS);
- }
 
- for(let j=0;j<stationCount;j++){
+ for(let j=0;j<stationCount;j++)
   cells[slots[pos++]].name=random(STATIONS);
- }
 
  cells[slots[pos++]].name=randomStaff();
 
- const pool=[
-  ...NORMAL,
-  ...STAFF_BASE
- ];
+ const pool=[...NORMAL,...STAFF_BASE];
 
- while(pos<slots.length){
-  cells[slots[pos++]].name=
-   staffVariant(random(pool));
- }
+ while(pos<slots.length)
+  cells[slots[pos++]].name=staffVariant(random(pool));
 
  cells[free]={
-  name:'FREE',
-  checked:true,
-  kind:'free',
-  hit:false
+  name:'FREE',checked:true,kind:'free',hit:false
  };
 
  return {
-  cells,
-  free,
+  cells,free,
   initialStationCount:stationCount,
   initialAreaCount:areaCount,
-  last:null,
-  locked:false,
-  sound:true,
-  negiHistory:[],
-  hits:0,
-  hitEvents:{},
-  event25:false,
-  eventStation:false,
-  event7:false,
-
-  // 新イベントの発生済み記録
+  last:null,locked:false,sound:true,
+  negiHistory:[],hits:0,hitEvents:{},
+  event25:false,eventStation:false,event7:false,
   eventStaffComplete:false,
-
   threshold:25+Math.floor(Math.random()*11),
-  pending:null,
-  manualCount:0,
-  stationEventUndo:null
+  pending:null,manualCount:0,stationEventUndo:null
  };
 }
 
 function save(){
- localStorage.setItem(
-  KEY,
-  JSON.stringify(state)
- );
+ localStorage.setItem(KEY,JSON.stringify(state));
 }
 
 function load(){
  try{
-  const s=JSON.parse(
-   localStorage.getItem(KEY)
-  );
-
+  const s=JSON.parse(localStorage.getItem(KEY));
   if(s&&s.cells?.length===SIZE){
-
    if(!s.hasegawaMigrationV1){
     for(const c of s.cells){
-     if(c.name==='萩原さん'){
+     if(c.name==='萩原さん')
       c.name=staffVariant(c.name);
-     }
     }
-
     s.hasegawaMigrationV1=true;
    }
-
-   if(!s.hitEvents){
-    s.hitEvents={};
-   }
-
-   if(!s.negiHistory){
-    s.negiHistory=[];
-   }
-
-   if(!('stationEventUndo' in s)){
+   if(!s.hitEvents)s.hitEvents={};
+   if(!s.negiHistory)s.negiHistory=[];
+   if(!('stationEventUndo' in s))
     s.stationEventUndo=null;
-   }
-
-   // 旧カードにも新イベントを追加
-   if(!('eventStaffComplete' in s)){
+   if(!('eventStaffComplete' in s))
     s.eventStaffComplete=false;
-   }
-
-   localStorage.setItem(
-    KEY,
-    JSON.stringify(s)
-   );
-
+   localStorage.setItem(KEY,JSON.stringify(s));
    return s;
   }
  }catch(e){}
-
  return fresh();
 }
 
 function repairMissingStations(){
- if(state.cells.some(c=>isStation(c.name))){
+ if(state.cells.some(c=>isStation(c.name)))return false;
+ if(state.event25||state.eventStation||state.event7||state.pending)
   return false;
- }
-
- if(
-  state.event25||
-  state.eventStation||
-  state.event7||
-  state.pending
- ){
-  return false;
- }
 
  const candidates=shuffle(
-  state.cells
-   .map((c,i)=>({c,i}))
+  state.cells.map((c,i)=>({c,i}))
    .filter(({c,i})=>
-    i!==state.free&&
-    !c.checked&&
-    c.kind==='normal'
-   )
+    i!==state.free&&!c.checked&&c.kind==='normal')
    .map(({i})=>i)
  );
 
  const names=shuffle(STATIONS).slice(
-  0,
-  Math.min(
-   candidates.length,
-   4+Math.floor(Math.random()*5)
-  )
+  0,Math.min(candidates.length,4+Math.floor(Math.random()*5))
  );
 
  names.forEach((name,j)=>{
@@ -860,108 +441,49 @@ function repairMissingStations(){
  });
 
  state.initialStationCount=names.length;
-
  return names.length>0;
 }
 
-/* 集計 */
-
 function checkedCount(){
- return state.cells.filter(c=>
-  c.checked&&c.kind!=='free'
- ).length;
+ return state.cells.filter(c=>c.checked&&c.kind!=='free').length;
 }
 
 function manualCount(){
  return state.cells.filter(c=>
-  c.checked&&
-  !['free','orange','darkblue'].includes(c.kind)
+  c.checked&&!['free','orange','darkblue'].includes(c.kind)
  ).length;
 }
 
 function linesStatus(){
- const bingo=[];
- const reach=[];
-
+ const bingo=[],reach=[];
  for(const line of LINES){
-  const open=line.filter(i=>
-   state.cells[i].checked
-  ).length;
-
-  if(open===N){
-   bingo.push(line);
-  }else if(open===N-1){
-   reach.push(line);
-  }
+  const open=line.filter(i=>state.cells[i].checked).length;
+  if(open===N)bingo.push(line);
+  else if(open===N-1)reach.push(line);
  }
-
  return {bingo,reach};
 }
 
-/*
- スタッフ制覇条件
-
- 1. カードにスタッフが1枚以上存在
- 2. すべてのスタッフマスが開封済み
- 3. FREEを除き60マス以上開封
- 4. リーチが1本以上
-*/
-
 function staffCompleteConditions(){
- const staffCells=state.cells.filter(c=>
-  isStaff(c.name)
- );
-
- if(staffCells.length===0){
-  return false;
- }
-
- if(!staffCells.every(c=>c.checked)){
-  return false;
- }
-
- if(checkedCount()<60){
-  return false;
- }
-
- const {reach}=linesStatus();
-
- if(reach.length===0){
-  return false;
- }
-
- return true;
+ const staffCells=state.cells.filter(c=>isStaff(c.name));
+ if(!staffCells.length)return false;
+ if(!staffCells.every(c=>c.checked))return false;
+ if(checkedCount()<60)return false;
+ return linesStatus().reach.length>0;
 }
-
-/*
- リーチを完成させる未開封マスの
- 候補を集める。
-
- 複数のリーチで共通するマスも
- 重複させず1枚として扱う。
-*/
 
 function getReachTargets(){
- const {reach}=linesStatus();
-
- const result=new Set();
-
- for(const line of reach){
+ const targets=new Set();
+ for(const line of linesStatus().reach){
   for(const i of line){
-   if(!state.cells[i].checked){
-    result.add(i);
-   }
+   if(!state.cells[i].checked)targets.add(i);
   }
  }
-
- return shuffle([...result]);
+ return shuffle([...targets]);
 }
-
-/* 表示 */
 
 function render(){
  const {bingo,reach}=linesStatus();
-
  const bset=new Set(bingo.flat());
  const rset=new Set(reach.flat());
 
@@ -969,227 +491,137 @@ function render(){
 
  state.cells.forEach((c,i)=>{
   const b=document.createElement('button');
-
   b.className='cell';
 
   const special=[
-   'red',
-   'aqua',
-   'darkgreen',
-   'orange',
-   'darkblue'
+   'red','aqua','darkgreen','orange','darkblue'
   ].includes(c.kind);
 
   if(pickMode){
-
-   if(!c.checked){
-    b.classList.add('pick');
-   }else{
-    b.classList.add(
-     c.kind==='free'
-      ?'free'
-      :c.kind==='normal'
-       ?'checked'
-       :c.kind
-    );
-   }
-
+   if(!c.checked)b.classList.add('pick');
+   else b.classList.add(
+    c.kind==='free'?'free':
+    c.kind==='normal'?'checked':c.kind
+   );
   }else if(special){
-
    b.classList.add(c.kind);
-
   }else if(c.kind==='love'){
-
    b.classList.add('love');
-
-   if(bset.has(i)&&c.checked){
-    b.classList.add('bingo');
-   }else if(state.last===i&&c.checked){
-    b.classList.add('last');
-   }else if(c.checked){
-    b.classList.add('checked');
-   }
-
+   if(bset.has(i)&&c.checked)b.classList.add('bingo');
+   else if(state.last===i&&c.checked)b.classList.add('last');
+   else if(c.checked)b.classList.add('checked');
   }else if(bset.has(i)){
-
    b.classList.add('bingo');
-
   }else if(rset.has(i)&&!c.checked){
-
    b.classList.add('reach');
-
   }else if(state.last===i&&c.checked){
-
    b.classList.add('last');
-
   }else if(c.checked){
-
    b.classList.add('checked');
   }
 
-  if(c.kind==='free'){
-   b.classList.add('free');
-  }
+  if(c.kind==='free')b.classList.add('free');
 
-  if(
-   negiSearchActive&&
-   isStation(c.name)&&
-   !c.checked
-  ){
+  if(negiSearchActive&&isStation(c.name)&&!c.checked)
    b.classList.add('negi-found');
-  }
 
   b.textContent=c.name;
   b.title=`${i+1}: ${c.name}`;
-
-  b.onclick=()=>
-   pickMode?choosePanel(i):toggle(i);
-
+  b.onclick=()=>pickMode?choosePanel(i):toggle(i);
   $('board').appendChild(b);
  });
 
- $('board').classList.toggle(
-  'pickmode',
-  pickMode
- );
+ $('board').classList.toggle('pickmode',pickMode);
 
  $('stats').textContent=
   `開封 ${checkedCount()} / 99　｜　`+
   `あたり ${state.hits} 枚　｜　`+
   `リーチ ${reach.length}　｜　`+
   `ビンゴ ${bingo.length}`+
-  (bingo.length===LINES.length
-   ?' 🎉 ALL BINGO!'
-   :'');
+  (bingo.length===LINES.length?' 🎉 ALL BINGO!':'');
 
- $('lock').textContent=
-  state.locked
-   ?'🔒 ロック中'
-   :'🔓 ロック';
+ $('lock').textContent=state.locked?'🔒 ロック中':'🔓 ロック';
+ $('sound').textContent=state.sound?'🔊 音あり':'🔇 消音';
 
- $('sound').textContent=
-  state.sound
-   ?'🔊 音あり'
-   :'🔇 消音';
-
- $('new').disabled=
-  state.locked||pickMode||modalBusy;
-
- $('negi').disabled=
-  pickMode||modalBusy;
-
- $('negiSearch').disabled=
-  pickMode||modalBusy;
-
- $('undo').disabled=
-  pickMode||
-  modalBusy||
-  !state.negiHistory.length;
-
+ $('new').disabled=state.locked||pickMode||modalBusy;
+ $('negi').disabled=pickMode||modalBusy;
+ $('negiSearch').disabled=pickMode||modalBusy;
+ $('undo').disabled=pickMode||modalBusy||!state.negiHistory.length;
  $('undoStationEvent').disabled=
-  state.locked||
-  pickMode||
-  modalBusy||
-  !state.eventStation;
+  state.locked||pickMode||modalBusy||!state.eventStation;
+ $('reset').disabled=state.locked||pickMode||modalBusy;
 
- $('reset').disabled=
-  state.locked||
-  pickMode||
-  modalBusy;
-
+ /*
+  検索候補から愛❤️を除外。
+  カード上に愛❤️が存在しても表示しない。
+ */
  const names=[...new Set([
   ...AREAS,
   ...NORMAL,
   ...STAFF,
   ...STATIONS,
   'FREE',
-  '愛❤️',
   ...state.cells.map(c=>c.name)
- ])].sort(comparePanels);
+ ])].filter(name=>name!=='愛❤️')
+   .sort(comparePanels);
 
  const v=$('search').value;
-
  $('search').innerHTML=
   '<option value="">🔍 パネル検索</option>';
 
  for(const n of names){
   const o=document.createElement('option');
-
   o.value=n;
   o.textContent=n;
-
   $('search').appendChild(o);
  }
 
- $('search').value=
-  names.includes(v)?v:'';
+ $('search').value=names.includes(v)?v:'';
+ if(v&&names.includes(v))highlight(v);
 
- if(v){
-  highlight(v);
- }
-
- updateLineEffects(
-  bingo.length,
-  reach.length
- );
+ updateLineEffects(bingo.length,reach.length);
 }
 
 function showBingoImage(){
  const layer=document.createElement('div');
-
  layer.style=
-  'position:fixed;inset:0;z-index:95;'+
-  'display:flex;align-items:center;'+
-  'justify-content:center;'+
-  'background:#07071bc9;'+
-  'pointer-events:none;padding:16px';
+  'position:fixed;inset:0;z-index:95;display:flex;'+
+  'align-items:center;justify-content:center;'+
+  'background:#07071bc9;pointer-events:none;padding:16px';
 
  const img=document.createElement('img');
-
  img.src='BINGO.png';
  img.alt='BINGO!';
-
  img.style=
-  'max-width:min(95vw,520px);'+
-  'max-height:85vh;object-fit:contain;'+
-  'filter:drop-shadow(0 0 22px #fff8)';
+  'max-width:min(95vw,520px);max-height:85vh;'+
+  'object-fit:contain;filter:drop-shadow(0 0 22px #fff8)';
 
  img.onerror=()=>{
   img.remove();
-
-  const fallback=document.createElement('div');
-
-  fallback.textContent='🎉 BINGO!';
-  fallback.style=
+  const f=document.createElement('div');
+  f.textContent='🎉 BINGO!';
+  f.style=
    'background:white;border-radius:20px;'+
    'padding:24px;font-size:32px;font-weight:bold';
-
-  layer.appendChild(fallback);
+  layer.appendChild(f);
  };
 
  layer.appendChild(img);
  document.body.appendChild(layer);
-
  setTimeout(()=>layer.remove(),2200);
 }
 
 function updateLineEffects(bingoCount,reachCount){
  if(previousBingoCount!==null){
-
   if(bingoCount>previousBingoCount){
-
    playGameSound(bingoAudio);
    showBingoImage();
-
   }else if(
-   previousReachCount!==null&&
-   reachCount>previousReachCount
+   previousReachCount!==null&&reachCount>previousReachCount
   ){
-
    playGameSound(reachAudio);
   }
  }
-
  previousBingoCount=bingoCount;
  previousReachCount=reachCount;
 }
@@ -1197,63 +629,42 @@ function updateLineEffects(bingoCount,reachCount){
 function highlight(v){
  [...$('board').children].forEach((el,i)=>{
   el.classList.toggle(
-   'search-hit',
-   !!v&&state.cells[i].name===v
+   'search-hit',!!v&&state.cells[i].name===v
   );
  });
 }
 
-/* 濃い青マス3回タップ解除 */
-
 function handleBlueTap(i){
  if(modalBusy||pickMode)return;
 
- if(blueTapIndex===i){
-  blueTapCount++;
- }else{
+ if(blueTapIndex===i)blueTapCount++;
+ else{
   blueTapIndex=i;
   blueTapCount=1;
  }
 
- if(blueTapCount<3){
-  return;
- }
-
+ if(blueTapCount<3)return;
  blueTapIndex=-1;
  blueTapCount=0;
 
  if(!confirm(
   'この濃い青マスの自動開封を取り消しますか？'
- )){
-  return;
- }
+ ))return;
 
  const c=state.cells[i];
-
- if(
-  c.kind!=='darkblue'||
-  !c.checked
- ){
-  return;
- }
+ if(c.kind!=='darkblue'||!c.checked)return;
 
  c.checked=false;
  c.kind='normal';
  c.hit=false;
-
- if(state.last===i){
-  state.last=null;
- }
+ if(state.last===i)state.last=null;
 
  save();
  render();
 }
 
-/* 通常マスの開閉 */
-
 function toggle(i){
  if(modalBusy||pickMode)return;
-
  const c=state.cells[i];
 
  if(c.kind==='darkblue'){
@@ -1264,14 +675,11 @@ function toggle(i){
  blueTapIndex=-1;
  blueTapCount=0;
 
- if(['free','orange'].includes(c.kind)){
-  return;
- }
+ if(['free','orange'].includes(c.kind))return;
 
  c.checked=!c.checked;
 
  if(c.checked){
-
   if(['red','aqua'].includes(c.kind)){
    c.originalTransformKind=c.kind;
    c.kind='darkgreen';
@@ -1280,56 +688,34 @@ function toggle(i){
   state.last=i;
 
   if(Math.random()<1/6){
-
    c.hit=true;
    state.hits++;
-
    showHitImage(state.hits);
 
-   if(
-    state.hits===7&&
-    !state.hitEvents.sevenAudio
-   ){
+   if(state.hits===7&&!state.hitEvents.sevenAudio){
     state.hitEvents.sevenAudio=true;
     playGameSound(sevenAudio);
    }
 
-   if(
-    state.hits===10&&
-    !state.hitEvents.tenAudio
-   ){
+   if(state.hits===10&&!state.hitEvents.tenAudio){
     state.hitEvents.tenAudio=true;
     playGameSound(tenAudio);
    }
-
   }else{
    c.hit=false;
   }
-
  }else{
-
   if(c.kind==='darkgreen'){
-
-   c.kind=
-    c.originalTransformKind==='aqua'
-     ?'aqua'
-     :'red';
-
+   c.kind=c.originalTransformKind==='aqua'?'aqua':'red';
    delete c.originalTransformKind;
   }
 
   if(c.hit){
-   state.hits=Math.max(
-    0,
-    state.hits-1
-   );
-
+   state.hits=Math.max(0,state.hits-1);
    c.hit=false;
   }
 
-  if(state.last===i){
-   state.last=null;
-  }
+  if(state.last===i)state.last=null;
  }
 
  save();
@@ -1339,74 +725,51 @@ function toggle(i){
 
 function showHitImage(count){
  const layer=document.createElement('div');
-
  layer.style=
-  'position:fixed;inset:0;z-index:90;'+
-  'display:flex;align-items:center;'+
-  'justify-content:center;'+
-  'background:#07071b99;'+
-  'pointer-events:none;padding:16px';
+  'position:fixed;inset:0;z-index:90;display:flex;'+
+  'align-items:center;justify-content:center;'+
+  'background:#07071b99;pointer-events:none;padding:16px';
 
  const img=document.createElement('img');
-
- img.src=
-  count%5===0
-   ?'kirakira.png'
-   :'negi.png';
-
+ img.src=count%5===0?'kirakira.png':'negi.png';
  img.alt='あたり！';
-
  img.style=
-  'max-width:min(95vw,520px);'+
-  'max-height:85vh;object-fit:contain;'+
-  'filter:drop-shadow(0 0 20px #fff8)';
+  'max-width:min(95vw,520px);max-height:85vh;'+
+  'object-fit:contain;filter:drop-shadow(0 0 20px #fff8)';
 
  img.onerror=()=>{
   img.remove();
-
-  const fallback=document.createElement('div');
-
-  fallback.textContent='🎯 あたり！';
-  fallback.style=
+  const f=document.createElement('div');
+  f.textContent='🎯 あたり！';
+  f.style=
    'background:white;border-radius:20px;'+
    'padding:24px;font-size:28px;font-weight:bold';
-
-  layer.appendChild(fallback);
+  layer.appendChild(f);
  };
 
  layer.appendChild(img);
  document.body.appendChild(layer);
-
  setTimeout(()=>layer.remove(),1800);
 }
 
 function toast(msg){
  const el=document.createElement('div');
-
  el.textContent=msg;
-
  el.style=
   'position:fixed;top:15%;left:50%;'+
-  'transform:translateX(-50%);'+
-  'background:#fff;padding:16px 28px;'+
-  'border-radius:15px;z-index:80;'+
+  'transform:translateX(-50%);background:#fff;'+
+  'padding:16px 28px;border-radius:15px;z-index:80;'+
   'font-size:22px;box-shadow:0 5px 30px #0006';
-
  document.body.appendChild(el);
-
  setTimeout(()=>el.remove(),1600);
 }
 
-/* イベント画面 */
-
 function show(title,text,img,buttons){
  modalBusy=true;
-
  $('mtitle').textContent=title;
  $('mtext').textContent=text||'';
 
  const im=$('scene');
-
  if(img){
   im.src=encodeURI(img);
   im.classList.remove('hidden');
@@ -1419,10 +782,8 @@ function show(title,text,img,buttons){
 
  for(const [label,fn] of buttons){
   const b=document.createElement('button');
-
   b.textContent=label;
   b.onclick=fn;
-
   $('mactions').appendChild(b);
  }
 
@@ -1431,33 +792,21 @@ function show(title,text,img,buttons){
 
 function close(){
  modalBusy=false;
-
  $('modal').classList.remove('show');
-
  save();
  render();
-
  setTimeout(queueEvents,50);
 }
 
 function message(title,text,img,after=close){
- show(
-  title,
-  text,
-  img,
-  [['OK',after]]
- );
+ show(title,text,img,[['OK',after]]);
 }
 
 function eligible(pred){
  return shuffle(
-  state.cells
-   .map((c,i)=>({c,i}))
+  state.cells.map((c,i)=>({c,i}))
    .filter(({c,i})=>
-    i!==state.free&&
-    !c.checked&&
-    pred(c)
-   )
+    i!==state.free&&!c.checked&&pred(c))
    .map(({i})=>i)
  );
 }
@@ -1465,90 +814,53 @@ function eligible(pred){
 function transform(indices,names,kind){
  indices.forEach((i,j)=>{
   const c=state.cells[i];
-
   c.name=names[j%names.length];
   c.kind=kind;
   c.checked=false;
   c.hit=false;
-
   delete c.originalTransformKind;
  });
 }
 
 function allStationsOpen(){
- const a=state.cells.filter(c=>
-  isStation(c.name)
- );
-
- return a.length>0&&
-  a.every(c=>c.checked);
+ const a=state.cells.filter(c=>isStation(c.name));
+ return a.length>0&&a.every(c=>c.checked);
 }
 
-/* イベント判定 */
-
 function queueEvents(){
- if(
-  modalBusy||
-  pickMode||
-  state.pending
- ){
-  return;
- }
+ if(modalBusy||pickMode||state.pending)return;
 
- if(
-  !state.event25&&
-  manualCount()>=state.threshold
- ){
+ if(!state.event25&&manualCount()>=state.threshold){
   state.event25=true;
   state.pending='question';
-
   save();
   question();
   return;
  }
 
- if(
-  !state.eventStation&&
-  allStationsOpen()
- ){
+ if(!state.eventStation&&allStationsOpen()){
   state.eventStation=true;
   state.pending='station';
-
   save();
   stationEvent();
   return;
  }
 
- if(
-  !state.event7&&
-  state.hits>=7
- ){
+ if(!state.event7&&state.hits>=7){
   state.event7=true;
   state.pending='seven';
-
   save();
   sevenEvent();
   return;
  }
 
- /*
-  新イベント：
-  スタッフパネル制覇！
- */
- if(
-  !state.eventStaffComplete&&
-  staffCompleteConditions()
- ){
+ if(!state.eventStaffComplete&&staffCompleteConditions()){
   state.eventStaffComplete=true;
   state.pending='staffComplete';
-
   save();
   staffCompleteEvent();
-  return;
  }
 }
-
-/* 25～35マスイベント */
 
 function question(){
  show(
@@ -1557,13 +869,9 @@ function question(){
   'Q.png',
   [
    ['YES',()=>{
-    const ids=eligible(c=>
-     !isStation(c.name)
-    );
-
+    const ids=eligible(c=>!isStation(c.name));
     const n=Math.min(
-     ids.length,
-     1+Math.floor(Math.random()*3)
+     ids.length,1+Math.floor(Math.random()*3)
     );
 
     transform(
@@ -1573,28 +881,22 @@ function question(){
     );
 
     state.pending=null;
-
     message(
      'YES！',
      `${n}枚がステーションパネルに変わったよ！`,
      'YES.png'
     );
    }],
-
    ['NO',()=>{
     const lied=state.cells.some(c=>
-     c.checked&&
-     isStation(c.name)&&
-     c.kind!=='orange'
+     c.checked&&isStation(c.name)&&c.kind!=='orange'
     );
 
     if(lied){
      const f=state.cells[state.free];
-
      f.name='塩浜';
      f.checked=false;
      f.kind='red';
-
      state.pending=null;
 
      message(
@@ -1602,17 +904,12 @@ function question(){
       'FREEが塩浜に変わっちゃった！',
       'koto.png'
      );
-
      return;
     }
 
-    const ids=eligible(c=>
-     isStation(c.name)
-    );
-
+    const ids=eligible(c=>isStation(c.name));
     const n=Math.min(
-     ids.length,
-     1+Math.floor(Math.random()*3)
+     ids.length,1+Math.floor(Math.random()*3)
     );
 
     transform(
@@ -1622,7 +919,6 @@ function question(){
     );
 
     state.pending=null;
-
     message(
      'NO！',
      `${n}枚がスタッフパネルに変わったよ！`,
@@ -1633,8 +929,6 @@ function question(){
  );
 }
 
-/* 全ステーションイベント */
-
 function stationEvent(){
  show(
   '全部行ったんだのね',
@@ -1643,10 +937,8 @@ function stationEvent(){
   [
    ['増やす',()=>{
     const ids=eligible(()=>true);
-
     const n=Math.min(
-     ids.length,
-     1+Math.floor(Math.random()*3)
+     ids.length,1+Math.floor(Math.random()*3)
     );
 
     transform(
@@ -1664,7 +956,6 @@ function stationEvent(){
      'up.png'
     );
    }],
-
    ['増やさない',()=>{
     const ids=eligible(()=>true);
 
@@ -1684,7 +975,6 @@ function stationEvent(){
     }
 
     state.pending=null;
-
     message(
      'ふ～ん',
      '未開封の1枚を開けてあげたよ。',
@@ -1695,30 +985,22 @@ function stationEvent(){
  );
 }
 
-/* イベント取消 */
-
 function undoStationEvent(){
- if(
-  modalBusy||
-  pickMode||
-  state.locked
- ){
-  return;
- }
+ if(modalBusy||pickMode||state.locked)return;
 
  if(!state.eventStation){
   alert('取り消すイベントがありません。');
   return;
  }
 
- const history=state.stationEventUndo;
+ const h=state.stationEventUndo;
 
  if(
-  !history||
-  !Number.isInteger(history.index)||
-  !state.cells[history.index]||
-  state.cells[history.index].kind!=='darkblue'||
-  !state.cells[history.index].checked
+  !h||
+  !Number.isInteger(h.index)||
+  !state.cells[h.index]||
+  state.cells[h.index].kind!=='darkblue'||
+  !state.cells[h.index].checked
  ){
   alert(
    'このイベントの自動開封履歴を特定できません。\n'+
@@ -1726,38 +1008,30 @@ function undoStationEvent(){
    'そのマスだけを取り消せます。\n'+
    'カードは変更していません。'
   );
-
   return;
  }
 
- const c=state.cells[history.index];
+ const c=state.cells[h.index];
 
  if(!confirm(
   `${c.name} のイベント開封を取り消しますか？\n\n`+
   'イベントの発生済み状態も解除します。'
- )){
-  return;
- }
+ ))return;
 
- c.checked=history.previousChecked;
- c.kind=history.previousKind||'normal';
+ c.checked=h.previousChecked;
+ c.kind=h.previousKind||'normal';
  c.hit=false;
 
  state.eventStation=false;
  state.stationEventUndo=null;
  state.pending=null;
 
- if(state.last===history.index){
-  state.last=null;
- }
+ if(state.last===h.index)state.last=null;
 
  save();
  render();
-
  alert('イベントを取り消しました。');
 }
-
-/* あたり7枚イベント */
 
 function sevenEvent(){
  show(
@@ -1770,36 +1044,28 @@ function sevenEvent(){
     const {reach}=linesStatus();
 
     const priority=new Set(
-     reach.flat().filter(i=>
-      !state.cells[i].checked
-     )
+     reach.flat().filter(i=>!state.cells[i].checked)
     );
 
     ids.sort((a,b)=>
-     Number(priority.has(b))-
-     Number(priority.has(a))
+     Number(priority.has(b))-Number(priority.has(a))
     );
 
     const selected=ids.slice(0,3);
 
     transform(
      selected,
-     Array.from(
-      {length:3},
-      ()=>random(STATIONS)
-     ),
+     Array.from({length:3},()=>random(STATIONS)),
      'red'
     );
 
     state.pending=null;
-
     message(
      'Aを選択！',
      `${selected.length}枚がARK3以外のステーションに変化！`,
      'YES.png'
     );
    }],
-
    ['B：笹塚への愛',()=>sevenB()]
   ]
  );
@@ -1813,23 +1079,15 @@ function sevenB(){
   [
    ['いいえ',()=>{
     state.pending=null;
-
     message(
      'じゃあそのままにしとくね',
      '今回は変化なし。',
      'bay.png'
     );
    }],
-
    ['はい',()=>{
     const ids=eligible(()=>true).slice(0,1);
-
-    transform(
-     ids,
-     ['笹塚'],
-     'red'
-    );
-
+    transform(ids,['笹塚'],'red');
     state.pending='choose';
     save();
 
@@ -1852,9 +1110,7 @@ function startPick(){
   [
    ['選択画面へ',()=>{
     modalBusy=false;
-
     $('modal').classList.remove('show');
-
     pickMode=true;
     render();
    }]
@@ -1864,7 +1120,6 @@ function startPick(){
 
 function choosePanel(i){
  const c=state.cells[i];
-
  if(!pickMode)return;
 
  if(c.checked){
@@ -1874,7 +1129,6 @@ function choosePanel(i){
 
  c.checked=true;
  c.kind='darkblue';
-
  pickMode=false;
  state.pending=null;
 
@@ -1889,27 +1143,8 @@ function choosePanel(i){
 }
 
 /*
- =====================================
- 新イベント：スタッフパネル制覇！
- =====================================
-
- 表向きは50/50
-
- 実際は：
- スタッフ 50%
- ステーション 20%
- 愛❤️ 30%
-
- まず50%でスタッフ当たり。
- 残り50%のうち、
- 60%を愛❤️へ変換する。
-
- 0.5 × 0.6 = 0.3
-
- 最終的に
- スタッフ 50%
- ステーション 20%
- 愛❤️ 30%
+ スタッフパネル制覇イベント
+ スタッフ50%／ステーション20%／愛❤️30%
 */
 
 function staffCompleteEvent(){
@@ -1920,13 +1155,9 @@ function staffCompleteEvent(){
   'ハズレならステーションマスに！',
   null,
   [
-   ['挑戦する！',()=>{
-    staffCompleteChallenge();
-   }],
-
+   ['挑戦する！',()=>staffCompleteChallenge()],
    ['挑戦しない',()=>{
     state.pending=null;
-
     message(
      '今回は見送り！',
      'スタッフパネル制覇、おめでとう！',
@@ -1938,23 +1169,18 @@ function staffCompleteEvent(){
 }
 
 function staffCompleteChallenge(){
-
  const targets=getReachTargets();
 
- if(targets.length===0){
-
+ if(!targets.length){
   state.pending=null;
-
   message(
    '対象マスがありません',
    'リーチを完成させる未開封マスが見つからなかったよ。',
    null
   );
-
   return;
  }
 
- // リーチの最後の1マスをランダムに選択
  const i=random(targets);
  const c=state.cells[i];
 
@@ -1963,71 +1189,44 @@ function staffCompleteChallenge(){
  let result;
 
  if(roll<0.5){
-
   result='staff';
-
  }else{
-
-  // ステーション側50%のうち
-  // 60%を愛❤️へ変更
-  const loveRoll=Math.random();
-
-  result=
-   loveRoll<0.6
-    ?'love'
-    :'station';
+  result=Math.random()<0.6?'love':'station';
  }
 
- /*
-  マスの開封状態は変更しない。
-  名前と種類のみ変更する。
- */
-
  if(result==='staff'){
-
   c.name=randomStaff();
   c.kind='aqua';
-
  }else if(result==='station'){
-
   c.name=random(STATIONS);
   c.kind='red';
-
  }else{
-
   c.name='愛❤️';
   c.kind='love';
  }
 
  c.checked=false;
  c.hit=false;
-
  delete c.originalTransformKind;
 
  state.pending=null;
-
  save();
 
  if(result==='staff'){
-
   message(
    '🎉 当たり！！',
    'リーチマスがスタッフパネルに変わったよ！\n\n'+
    `新しいパネル：${c.name}`,
    null
   );
-
  }else if(result==='station'){
-
   message(
    '残念！ ハズレ！',
    'リーチマスがステーションパネルに変わったよ！\n\n'+
    `新しいパネル：${c.name}`,
    null
   );
-
  }else{
-
   message(
    '❤️ 愛があふれた！',
    'なんと、特別な「愛❤️」パネルが出現！\n\n'+
@@ -2037,14 +1236,10 @@ function staffCompleteChallenge(){
  }
 }
 
-/* ネギ配達 */
-
 function negiDelivery(){
  if(modalBusy||pickMode)return;
 
- const ids=eligible(c=>
-  isStation(c.name)
- );
+ const ids=eligible(c=>isStation(c.name));
 
  if(!ids.length){
   toast('未開封のステーションがないよ');
@@ -2054,11 +1249,7 @@ function negiDelivery(){
  const i=ids[0];
  const c=state.cells[i];
 
- state.negiHistory.push({
-  i,
-  kind:c.kind
- });
-
+ state.negiHistory.push({i,kind:c.kind});
  c.checked=true;
  c.kind='orange';
  state.last=i;
@@ -2069,13 +1260,7 @@ function negiDelivery(){
 }
 
 function negiUndo(){
- if(
-  modalBusy||
-  pickMode||
-  !state.negiHistory.length
- ){
-  return;
- }
+ if(modalBusy||pickMode||!state.negiHistory.length)return;
 
  const x=state.negiHistory.pop();
  const c=state.cells[x.i];
@@ -2083,66 +1268,43 @@ function negiUndo(){
  if(c.kind==='orange'){
   c.checked=false;
   c.kind=x.kind||'normal';
-
-  if(state.last===x.i){
-   state.last=null;
-  }
+  if(state.last===x.i)state.last=null;
  }
 
  save();
  render();
 }
 
-/* 操作ボタン */
-
 $('negiSearch').onclick=()=>{
  if(modalBusy||pickMode)return;
-
  negiSearchActive=!negiSearchActive;
-
  render();
 };
 
-$('search').onchange=e=>{
- highlight(e.target.value);
-};
-
+$('search').onchange=e=>highlight(e.target.value);
 $('negi').onclick=negiDelivery;
-
 $('undo').onclick=negiUndo;
-
 $('undoStationEvent').onclick=undoStationEvent;
 
 $('lock').onclick=()=>{
  if(modalBusy||pickMode)return;
-
  state.locked=!state.locked;
-
  save();
  render();
 };
 
 $('sound').onclick=()=>{
  state.sound=!state.sound;
-
  save();
  render();
 };
 
 $('new').onclick=()=>{
- if(
-  state.locked||
-  pickMode||
-  modalBusy
- ){
-  return;
- }
+ if(state.locked||pickMode||modalBusy)return;
 
  state=fresh();
-
  previousBingoCount=null;
  previousReachCount=null;
-
  blueTapIndex=-1;
  blueTapCount=0;
 
@@ -2151,35 +1313,20 @@ $('new').onclick=()=>{
 };
 
 $('reset').onclick=()=>{
- if(
-  state.locked||
-  pickMode||
-  modalBusy
- ){
-  return;
- }
+ if(state.locked||pickMode||modalBusy)return;
 
  if(!confirm(
   '全データを消去します。\n'+
   '元には戻せません。\n'+
   'よろしいですか？'
- )){
-  return;
- }
+ ))return;
 
- if(!confirm(
-  '本当に全データを消しますか？'
- )){
-  return;
- }
+ if(!confirm('本当に全データを消しますか？'))return;
 
  localStorage.removeItem(KEY);
-
  state=fresh();
-
  previousBingoCount=null;
  previousReachCount=null;
-
  blueTapIndex=-1;
  blueTapCount=0;
 
@@ -2188,47 +1335,24 @@ $('reset').onclick=()=>{
 };
 
 /* 起動 */
-
 state=load();
 
-if(repairMissingStations()){
- save();
-}
+if(repairMissingStations())save();
 
 render();
 
 if(state.pending){
-
  setTimeout(()=>{
-
-  if(state.pending==='question'){
-
-   question();
-
-  }else if(state.pending==='station'){
-
-   stationEvent();
-
-  }else if(state.pending==='seven'){
-
-   sevenEvent();
-
-  }else if(state.pending==='choose'){
-
-   startPick();
-
-  }else if(state.pending==='staffComplete'){
-
+  if(state.pending==='question')question();
+  else if(state.pending==='station')stationEvent();
+  else if(state.pending==='seven')sevenEvent();
+  else if(state.pending==='choose')startPick();
+  else if(state.pending==='staffComplete')
    staffCompleteEvent();
-  }
-
  },300);
-
 }else{
-
  queueEvents();
 }
-
 </script>
 </body>
 </html>
